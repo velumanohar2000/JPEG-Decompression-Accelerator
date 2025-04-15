@@ -31,7 +31,6 @@ This decoder supports **baseline sequential encoded JFIF files** with **4:2:0 ch
 - MATLAB
 - Required modules:
   ```
-  module load eecs598-002/f23
   module load verdi
   module load vcs
   ```
