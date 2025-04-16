@@ -90,7 +90,7 @@ logic [`Q-1:0] cb_out [7:0][7:0];
 logic [`Q-1:0] cr_out [7:0][7:0];
 logic valid_out_Buffer;
 
-channel_buffer_copy buffer (
+channel_buffer buffer (
     //in
     .clk(clk),
     .rst(rst),

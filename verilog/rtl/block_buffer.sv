@@ -22,7 +22,6 @@ module block_buffer (
     assign valid_out = clear_q;
     assign clear_n   = clear_d;
 
-    // Combinational logic
     always_comb begin
         buffer_d = buffer_q;
         head_d   = head_q;
