@@ -1,0 +1,39 @@
+ 
+****************************************
+Report : clock timing
+        -type summary
+Design : top
+Version: T-2022.03-SP3
+Date   : Fri Dec  6 22:32:49 2024
+****************************************
+
+  Clock: core_clk
+----------------------------------------------------------------------------
+  Maximum setup launch latency:
+      deHuffer_start_reg/CLK                                 0.20      wr-+
+
+  Minimum setup capture latency:
+      deHuffer_start_reg/CLK                                 0.20      wr-+
+
+  Minimum hold launch latency:
+      deHuffer_start_reg/CLK                                 0.20      br-+
+
+  Maximum hold capture latency:
+      deHuffer_start_reg/CLK                                 0.20      br-+
+
+  Maximum active transition:
+      deHuffer_start_reg/CLK                                 0.08      wr-+
+
+  Minimum active transition:
+      deHuffer_start_reg/CLK                                 0.08      wr-+
+
+  Maximum setup skew:
+      deHuffer_block_buff_clear_reg/CLK                                wr-+
+      deHuffer_block_buff_clear_reg/CLK                      0.00      wr-+
+
+  Maximum hold skew:
+      deHuffer_block_buff_clear_reg/CLK                                br-+
+      deHuffer_block_buff_clear_reg/CLK                      0.00      br-+
+----------------------------------------------------------------------------
+
+1

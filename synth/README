@@ -1,0 +1,15 @@
+To use this PDK, run the following line in your shell:
+module load eecs598-002/f23
+
+template.zip contains an example project folder structure. You can use this structure with the provided scripts as a starting point.
+
+Please read Makefile for how to structure your folders and how to run synthesis and memory compilation.
+It is strongly recommended to read through scripts/synth.tcl and scripts/constraints.tcl line by line and understand them. 
+You can always modify these files for better performance / special needs.
+
+Memory compiler user manual directory: /afs/umich.edu/class/eecs598-002/SAED32/saed_mc_v3_0_1/saed_mc/doc/
+Standard cells library documents directory: /afs/umich.edu/class/eecs598-002/SAED32/SAED32_EDK/lib/stdcell_rvt/doc
+
+Contact the GSI (office hour or slack general channel) if your group needs help.
+
+Update: I forgot the change the unit of max_transition and the following two lines in *constraints.tcl*. It has been corrected. Please line 1~3 in your constraint.tcl as well.

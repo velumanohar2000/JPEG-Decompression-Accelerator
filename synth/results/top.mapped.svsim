@@ -1,0 +1,29 @@
+`ifndef SYNTHESIS
+
+//
+// This is an automatically generated file from 
+// dc_shell Version T-2022.03-SP3 -- Jul 12, 2022
+//
+
+// For simulation only. Do not modify.
+
+module top_svsim (
+        input logic clk, rst,
+    input logic [32-1:0] data_in,
+    input logic valid_in,
+    input HUFF_PACKET hp,
+    input QUANT_PACKET qp,
+        output logic request,
+    output logic unsigned [7:0] r [7:0][7:0],
+    output logic unsigned [7:0] g [7:0][7:0],
+    output logic unsigned [7:0] b [7:0][7:0],
+    output logic valid_out_Color
+);
+
+
+
+  top top( {>>{ clk }}, {>>{ rst }}, {>>{ data_in }}, {>>{ valid_in }}, 
+        {>>{ hp }}, {>>{ qp }}, {>>{ request }}, {>>{ r }}, {>>{ g }}, 
+        {>>{ b }}, {>>{ valid_out_Color }} );
+endmodule
+`endif

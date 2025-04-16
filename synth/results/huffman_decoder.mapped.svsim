@@ -1,0 +1,28 @@
+`ifndef SYNTHESIS
+
+//
+// This is an automatically generated file from 
+// dc_shell Version T-2022.03-SP3 -- Jul 12, 2022
+//
+
+// For simulation only. Do not modify.
+
+module huffman_decoder_svsim(
+    input  HUFF_PACKET huff_packet,
+    input  logic [15:0]     code,
+    input logic             valid_in,
+    input logic freq,
+    input logic [$clog2(3+1)-1:0] ch,
+
+    output logic [3:0]      run, vli_size, 
+    output logic [4:0]      code_size,
+    output logic            valid_out
+);
+
+
+
+  huffman_decoder huffman_decoder( {>>{ huff_packet }}, {>>{ code }}, 
+        {>>{ valid_in }}, {>>{ freq }}, {>>{ ch }}, {>>{ run }}, 
+        {>>{ vli_size }}, {>>{ code_size }}, {>>{ valid_out }} );
+endmodule
+`endif
