@@ -43,7 +43,7 @@ supersample_top supersampling (
     .valid_out(valid_1)   // 4 bits
 );
 
-channel_buffer_copy buffer (
+channel_buffer buffer (
     .clk(clk),
     .rst(rst),
     .blocks_in(blocks_in),
