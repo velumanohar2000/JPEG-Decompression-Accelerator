@@ -41,7 +41,7 @@ module top_tb;
         .valid_out_Color
     );
 
-    import displays::*;
+    // import displays::*;
 
     integer file_ptr, scan_len;
     integer curr_row, tab_idx;
