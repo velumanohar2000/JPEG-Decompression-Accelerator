@@ -12,7 +12,7 @@ fclose(fileID);
 %%%%%%%%%% USER: DO NOT EDIT BELOW %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Read Header Info
-Header = readmatrix(['../python/',imageName,'/HeaderInfo.txt']);
+Header = readmatrix(['../python/out/',imageName,'/HeaderInfo.txt']);
 
 height = Header(1,1);
 width = Header(1,2);

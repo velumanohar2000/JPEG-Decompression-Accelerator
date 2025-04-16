@@ -54,7 +54,7 @@ module top_tb;
 
     initial begin
         //Load Header info
-        file_ptr = $fopen({"../python/", img_filename, "/HeaderInfo.txt"}, "r");
+        file_ptr = $fopen({"../python/out/", img_filename, "/HeaderInfo.txt"}, "r");
         scan_len = $fscanf(file_ptr, "%d,%d\n", img_height, img_width);
         horizontal_blocks = $ceil(img_width/16.0)*2;
         vertical_blocks = $ceil(img_height/16.0)*2;
@@ -66,7 +66,7 @@ module top_tb;
         qp.map[1] = 1;
         qp.map[2] = 1;
 
-        file_ptr = $fopen({"../python/", img_filename, "/QuantTable0.txt"}, "r");
+        file_ptr = $fopen({"../python/out/", img_filename, "/QuantTable0.txt"}, "r");
         curr_row = 0;
         while(!$feof(file_ptr)) begin
             scan_len = $fscanf(file_ptr, "%d, %d, %d, %d, %d, %d, %d, %d\n",
@@ -77,7 +77,7 @@ module top_tb;
             curr_row = curr_row + 1;
         end
 
-        file_ptr = $fopen({"../python/", img_filename, "/QuantTable1.txt"}, "r");
+        file_ptr = $fopen({"../python/out/", img_filename, "/QuantTable1.txt"}, "r");
         curr_row = 0;
         while(!$feof(file_ptr)) begin
             scan_len = $fscanf(file_ptr, "%d, %d, %d, %d, %d, %d, %d, %d\n",
@@ -93,10 +93,10 @@ module top_tb;
         hp.map[1] = 1;
         hp.map[2] = 1;
 
-        load_dc_table(0, {"../python/", img_filename, "/DC_HuffTable_Index0Flipped.txt"});
-        load_dc_table(1, {"../python/", img_filename, "/DC_HuffTable_Index1Flipped.txt"});
-        load_ac_table(0, {"../python/", img_filename, "/AC_HuffTable_Index0Flipped.txt"});
-        load_ac_table(1, {"../python/", img_filename, "/AC_HuffTable_Index1Flipped.txt"});
+        load_dc_table(0, {"../python/out/", img_filename, "/DC_HuffTable_Index0Flipped.txt"});
+        load_dc_table(1, {"../python/out/", img_filename, "/DC_HuffTable_Index1Flipped.txt"});
+        load_ac_table(0, {"../python/out/", img_filename, "/AC_HuffTable_Index0Flipped.txt"});
+        load_ac_table(1, {"../python/out/", img_filename, "/AC_HuffTable_Index1Flipped.txt"});
 
         // initial values
         clk = 0;
@@ -111,7 +111,7 @@ module top_tb;
         g_file = $fopen({"out/", img_filename, "_G.txt"}, "w");
         b_file = $fopen({"out/", img_filename, "_B.txt"}, "w");
 
-        file_ptr = $fopen({"../python/", img_filename, "/bitStreamFlipped.txt"}, "r");
+        file_ptr = $fopen({"../python/out/", img_filename, "/bitStreamFlipped.txt"}, "r");
         scan_len = -1;
         while(!$feof(file_ptr)) begin
             @(negedge clk);

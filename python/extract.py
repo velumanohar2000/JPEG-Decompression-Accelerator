@@ -6,8 +6,8 @@ import sys
 ######## FILE I/O CONFIGURATION ###########
 inputImg = sys.argv[1]
 baseName = inputImg.split(".")[0]
-srcImgPath = "../images/"+baseName+".jpg"
-resultDir = baseName
+srcImgPath = "../images/" + baseName + ".jpg"
+resultDir = "out/" + baseName
 ######## OUTPUT FORMAT CONFIGURATION ###########
 outputFormat = "bin32" #Options: "binary" = one long string, "bin32" = lines of 32 bits, "hex" = lines of 32 hex
 ################################################
