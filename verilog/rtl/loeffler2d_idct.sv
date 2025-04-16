@@ -1,267 +1,234 @@
+
 `include "sys_defs.svh"
 
-module loeffler2d_idct (
+`define FIFO_SIZE 524288
 
+module loeffler2d_idct (
     input  logic clk,
     input  logic rst,
     input  logic valid_in,
     input  logic [$clog2(`CH+1)-1:0] channel_in,
-    input  logic signed   [11:0] idct_in  [7:0][7:0],
-    output logic unsigned [7:0]  idct_out [7:0][7:0],
+    input  logic signed [11:0] idct_in [7:0][7:0],  // Full 8x8 block input
+    output logic unsigned [7:0] idct_out [7:0][7:0], // Full 8x8 block output
     output logic [$clog2(`CH+1)-1:0] channel_out,
     output logic valid_out
-
 );
 
-logic clk_array                     [7:0];
-logic rst_array                     [7:0];
-logic valid_in_array                [7:0];
-logic first_valid_out_array         [7:0];
-logic [7:0] second_valid_out_array;
+    typedef struct {
+        logic signed [11:0] data [7:0][7:0];
+        logic [$clog2(`CH+1)-1:0] channel;
+    } idct_block_t;
+    
+    idct_block_t input_fifo [`FIFO_SIZE-1:0];
+    logic [63:0] fifo_head, fifo_tail;
+    logic [63:0] fifo_count;
 
-logic signed [63:0] idct_in_extended               [7:0][7:0];
-logic signed [63:0] transposed_block               [7:0][7:0];
-logic signed [63:0] first_idct_out_array           [7:0][7:0];
-logic signed [63:0] second_idct_out_array          [7:0][7:0];
-logic signed [63:0] idct_out_normalized            [7:0][7:0];
-logic signed [63:0] idct_out_norm_before_transpose [7:0][7:0];
+    // FSM state encoding
+    enum logic [2:0] {IDLE, PROCESS_ROWS, PROCESS_COLS, DONE, LOAD} state, next_state;
 
-logic [1:0] channel_out_internal;
+    // Internal buffers and signals
+    logic signed [63:0] idct_in_extended [7:0][7:0];
+    logic signed [63:0] row_idct_input [7:0];
+    logic signed [63:0] col_idct_input [7:0];
+    logic signed [63:0] row_idct_output [7:0];
+    logic signed [63:0] col_idct_output [7:0];
 
-always_comb begin
-    for(int i = 0; i < 8; i++) begin
-        clk_array[i]      = clk;
-        rst_array[i]      = rst;
-        valid_in_array[i] = valid_in;
-    end
-end
+    logic [3:0] valid_row_out_cnt;
+    logic [3:0] valid_col_out_cnt;
 
-// Sign extend input to 64 bits
-always_comb begin
-    for(int row = 0; row < 8; row++) begin
-        for(int col = 0; col < 8; col++) begin
-            idct_in_extended[row][col] = idct_in[row][col];
-        end
-    end
-end
+    // Memories to store intermediate results for transposition
+    logic signed [63:0] mem_rows [7:0][7:0];
+    logic signed [63:0] mem_cols [7:0][7:0];
 
-loeffler_idct row0_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(channel_in),
-    .idct_in(idct_in_extended[0]),
-    .idct_out(first_idct_out_array[0]),
-    .channel_out(channel_out_internal),
-    .valid_out(first_valid_out_array[0])
-);
+    // Normalization signals
+    logic signed [63:0] idct_out_normalized [7:0][7:0];
+    logic signed [63:0] idct_out_norm_before_transpose [7:0][7:0];
+    logic [1:0] internal_channel;
+    logic [1:0] channel_reg;
 
-loeffler_idct row1_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[1]),
-    .idct_out(first_idct_out_array[1]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[1])
-);
+    logic valid_row_out;
+    logic valid_col_out;
 
-loeffler_idct row2_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[2]),
-    .idct_out(first_idct_out_array[2]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[2])
-);
+    logic [3:0] col_input_cnt;
+    logic [3:0] row_input_cnt;
 
-loeffler_idct row3_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[3]),
-    .idct_out(first_idct_out_array[3]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[3])
-);
 
-loeffler_idct row4_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[4]),
-    .idct_out(first_idct_out_array[4]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[4])
-);
-
-loeffler_idct row5_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[5]),
-    .idct_out(first_idct_out_array[5]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[5])
-);
-
-loeffler_idct row6_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[6]),
-    .idct_out(first_idct_out_array[6]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[6])
-);
-
-loeffler_idct row7_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(valid_in),
-    .channel_in(),
-    .idct_in(idct_in_extended[7]),
-    .idct_out(first_idct_out_array[7]),
-    .channel_out(),
-    .valid_out(first_valid_out_array[7])
-);
-
-// Transpose output of first IDCT
-always_comb begin
-    for(int row = 0; row < 8; row++) begin
-        for(int col = 0; col < 8; col++) begin
-            transposed_block[row][col] = first_idct_out_array[col][row];
-        end
-    end
-end
-
-loeffler_idct col0_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[0]),
-    .channel_in(channel_out_internal),
-    .idct_in(transposed_block[0]),
-    .idct_out(second_idct_out_array[0]),
-    .channel_out(channel_out),
-    .valid_out(second_valid_out_array[0])
-);
-
-loeffler_idct col1_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[1]),
-    .channel_in(),
-    .idct_in(transposed_block[1]),
-    .idct_out(second_idct_out_array[1]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[1])
-);
-
-loeffler_idct col2_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[2]),
-    .channel_in(),
-    .idct_in(transposed_block[2]),
-    .idct_out(second_idct_out_array[2]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[2])
-);
-
-loeffler_idct col3_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[3]),
-    .channel_in(),
-    .idct_in(transposed_block[3]),
-    .idct_out(second_idct_out_array[3]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[3])
-);
-
-loeffler_idct col4_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[4]),
-    .channel_in(),
-    .idct_in(transposed_block[4]),
-    .idct_out(second_idct_out_array[4]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[4])
-);
-
-loeffler_idct col5_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[5]),
-    .channel_in(),
-    .idct_in(transposed_block[5]),
-    .idct_out(second_idct_out_array[5]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[5])
-);
-
-loeffler_idct col6_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[6]),
-    .channel_in(),
-    .idct_in(transposed_block[6]),
-    .idct_out(second_idct_out_array[6]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[6])
-);
-
-loeffler_idct col7_idct (
-    .clk(clk),
-    .rst(rst),
-    .valid_in(first_valid_out_array[7]),
-    .channel_in(),
-    .idct_in(transposed_block[7]),
-    .idct_out(second_idct_out_array[7]),
-    .channel_out(),
-    .valid_out(second_valid_out_array[7])
-);
-
-// Divide by 8 to normalize since Loeffler's DCT output is 8 times larger
-always_comb begin
-    for(int row = 0; row < 8; row++) begin
-        for(int col = 0; col < 8; col++) begin
-            idct_out_normalized[row][col] = '0;
-            idct_out_norm_before_transpose[row][col] = '0;
-            if(valid_out) begin
-                idct_out_normalized[row][col] = (second_idct_out_array[row][col] / 8) + 128;
-               
-                if(idct_out_normalized[row][col] > 255) begin
-                    idct_out_norm_before_transpose[row][col] = 255;
-                end
-                else if(idct_out_normalized[row][col] < 0) begin
-                    idct_out_norm_before_transpose[row][col] = 0;
-                end
-                else begin
-                    idct_out_norm_before_transpose[row][col] = idct_out_normalized[row][col];
+   // Next state and normalization logic (combinational)
+    always_comb begin
+        next_state = state; // default assignment
+        case (state)
+            IDLE: begin
+                if (fifo_count > 0) begin
+                    // for (int row = 0; row < 8; row++) begin
+                    //     for (int col = 0; col < 8; col++) begin
+                    //         idct_in_extended[row][col] = input_fifo[fifo_head].data[row][col];
+                    //     end
+                    // end
+                    next_state = LOAD;
+                end else begin
+                    next_state = IDLE;
                 end
             end
+            LOAD: next_state = PROCESS_ROWS;
+            PROCESS_ROWS: begin
+                // If we have captured all 8 rows, proceed to process columns.
+                if (valid_row_out_cnt == 'd7)
+                    next_state = PROCESS_COLS;
+                else begin
+                    // Set row_idct_input using the current row index.
+                    if (row_input_cnt < 'd8)
+                        row_idct_input = idct_in_extended[row_input_cnt];
+                    next_state = PROCESS_ROWS;
+                end
+            end
+            PROCESS_COLS: begin
+                // If we have captured all 8 columns, proceed to DONE state.
+                if (valid_col_out_cnt == 'd7)
+                    next_state = DONE;
+                else begin
+                    // Set col_idct_input using stored intermediate results.
+                    if (col_input_cnt < 'd8)
+                        col_idct_input = mem_rows[col_input_cnt];
+                    next_state = PROCESS_COLS;
+                end
+            end
+            DONE: begin
+                // Perform normalization for the full block.
+                for (int row = 0; row < 8; row++) begin
+                    for (int col = 0; col < 8; col++) begin
+                        // Normalize: shift right by 3 (divide by 8) and add 128.
+                        idct_out_normalized[row][col] = (mem_cols[row][col] >>> 3) + 128;
+                        if (idct_out_normalized[row][col] > 255)
+                            idct_out[row][col] = 255;
+                        else if (idct_out_normalized[row][col] < 0)
+                            idct_out[row][col] = 0;
+                        else
+                            idct_out[row][col] = idct_out_normalized[row][col];
+                    end
+                end
+                // Transition back to IDLE for the next block.
+                // if (!valid_in)
+                next_state = IDLE;
+                // else
+                //     next_state = DONE;
+            end
+
+        endcase
+    end
+
+// FSM state update and output assignment (sequential)
+always_ff @(posedge clk) begin
+    if (rst) begin
+        state  <= IDLE;
+        valid_row_out_cnt <= 3'd0;
+        row_input_cnt <= '0;
+        col_input_cnt <= '0;
+        valid_col_out_cnt <= 3'd0;
+        valid_out         <= 1'b0;
+        channel_out <= '0;
+        channel_reg <= '0;
+        fifo_head <= 'd0; fifo_tail <= 'd0; fifo_count <= 'd0;
+
+    end else begin
+        state <= next_state;
+        if (valid_in) begin 
+            if ( fifo_count < `FIFO_SIZE-1) begin
+                input_fifo[fifo_tail].data <= idct_in;
+                input_fifo[fifo_tail].channel <= channel_in;
+                fifo_tail <= fifo_tail + 'd1;
+                fifo_count <= fifo_count + 'd1;
+            end
+            else 
+                $display("fifo for the win");
         end
+        case (state)
+            IDLE: begin
+                //$display("IDLE state");
+                valid_out         <= 1'b0;   
+                valid_row_out_cnt <= 3'd0;
+                valid_col_out_cnt <= 3'd0;
+
+                row_input_cnt <= '0;
+                col_input_cnt <= '0;
+
+                channel_out <= '0;
+                channel_reg <= '0;
+
+            end
+            LOAD: begin
+                for (int r = 0; r < 8; r++)
+                    for (int c = 0; c < 8; c++)
+                        idct_in_extended[r][c] <= input_fifo[fifo_head].data[r][c];
+                channel_reg <= input_fifo[fifo_head].channel;
+                fifo_head <= fifo_head + 'd1;
+                fifo_count <= fifo_count - 'd1;
+            end
+            PROCESS_ROWS: begin
+                if (valid_row_out) begin
+                    // Capture the output of the row-IDCT for the current row.
+                    mem_rows[0][valid_row_out_cnt] <= row_idct_output[0];
+                    mem_rows[1][valid_row_out_cnt] <= row_idct_output[1];
+                    mem_rows[2][valid_row_out_cnt] <= row_idct_output[2];
+                    mem_rows[3][valid_row_out_cnt] <= row_idct_output[3];
+                    mem_rows[4][valid_row_out_cnt] <= row_idct_output[4];
+                    mem_rows[5][valid_row_out_cnt] <= row_idct_output[5];
+                    mem_rows[6][valid_row_out_cnt] <= row_idct_output[6];
+                    mem_rows[7][valid_row_out_cnt] <= row_idct_output[7];
+                    valid_row_out_cnt <= valid_row_out_cnt + 'd1;
+                end
+                row_input_cnt <= row_input_cnt + 'd1;
+            end
+            PROCESS_COLS: begin
+                if (valid_col_out) begin
+                    // Capture the output of the column-IDCT and transpose
+                    mem_cols[0][valid_col_out_cnt] <= col_idct_output[0];
+                    mem_cols[1][valid_col_out_cnt] <= col_idct_output[1];
+                    mem_cols[2][valid_col_out_cnt] <= col_idct_output[2];
+                    mem_cols[3][valid_col_out_cnt] <= col_idct_output[3];
+                    mem_cols[4][valid_col_out_cnt] <= col_idct_output[4];
+                    mem_cols[5][valid_col_out_cnt] <= col_idct_output[5];
+                    mem_cols[6][valid_col_out_cnt] <= col_idct_output[6];
+                    mem_cols[7][valid_col_out_cnt] <= col_idct_output[7];
+                    valid_col_out_cnt <= valid_col_out_cnt + 'd1;
+                end
+                col_input_cnt <= col_input_cnt + 'd1;
+            end
+            DONE: begin
+                valid_out   <= 1'b1;
+                channel_out <= channel_reg;
+            end
+           
+            default: valid_out <= 1'b0;
+
+        endcase
     end
 end
 
-// Transpose for final output
-always_comb begin
-    for(int row = 0; row < 8; row++) begin
-        for(int col = 0; col < 8; col++) begin
-            idct_out[row][col] = idct_out_norm_before_transpose[col][row];
-        end
-    end
-end
+    assign row_idct_valid = (state == PROCESS_ROWS);
+    assign col_idct_valid = (state == PROCESS_COLS);
 
-assign valid_out = &second_valid_out_array;
+    // Row IDCT instance
+    loeffler_idct row_idct_inst (
+        .clk(clk),
+        .rst(rst),
+        .valid_in(row_idct_valid),
+        .channel_in(channel_in),
+        .idct_in(row_idct_input),
+        .idct_out(row_idct_output),
+        .channel_out(),
+        .valid_out(valid_row_out)
+    );
+
+    // Column IDCT instance
+    loeffler_idct col_idct_inst (
+        .clk(clk),
+        .rst(rst),
+        .valid_in(col_idct_valid),
+        .channel_in(channel_in),
+        .idct_in(col_idct_input),
+        .idct_out(col_idct_output),
+        .channel_out(internal_channel),
+        .valid_out(valid_col_out)
+    );
 
 endmodule
