@@ -1,54 +1,69 @@
 `include "sys_defs.svh"
 
 module block_buffer (
-    input logic clk, rst,
-    input logic signed [11:0] vli_value,
-    input logic [3:0] run,
-    input logic wr_en, freq,
-    output logic [`BLOCK_BUFF_SIZE-1:0][11:0]data_out,
+    input  logic clk,
+    input  logic rst,
+    input  logic signed [11:0] vli_value,
+    input  logic [3:0] run,
+    input  logic wr_en,
+    input  logic freq,
+    output logic [`BLOCK_BUFF_SIZE-1:0][11:0] data_out,
     output logic valid_out,
     output logic clear_n
 );
 
-logic [`BLOCK_BUFF_SIZE-1:0] [11:0] buffer, buffer_n;
-logic [$clog2(`BLOCK_BUFF_SIZE+1)-1:0] head, head_n;
-logic clear;
+    // Internal registers
+    logic [`BLOCK_BUFF_SIZE-1:0][11:0] buffer_q, buffer_d;
+    logic [$clog2(`BLOCK_BUFF_SIZE+1)-1:0] head_q, head_d, index;
+    logic clear_q, clear_d;
 
-assign valid_out = clear;
-assign data_out = buffer;
+    // Outputs
+    assign data_out  = buffer_q;
+    assign valid_out = clear_q;
+    assign clear_n   = clear_d;
 
-always_comb begin
-    buffer_n = buffer;
-    head_n = head;
-    clear_n = 0;
+    // Combinational logic
+    always_comb begin
+        buffer_d = buffer_q;
+        head_d   = head_q;
+        clear_d  = 1'b0;
 
-    if (clear) begin
-        buffer_n = 0;
-    end
+        // Clear the buffer if requested
+        if (clear_q) begin
+            buffer_d = '0;
+        end
 
-    if (wr_en) begin
-        buffer_n[(head + run) % `BLOCK_BUFF_SIZE] = vli_value;
-        head_n = (head + run + 1) % `BLOCK_BUFF_SIZE; 
-        if ((!run && !vli_value) || (!head_n)) begin
-            // guarantee AC freq (account for 0 DC value case)
-            if (freq) begin
-                clear_n = 1;
-                head_n = 0;
+        if (wr_en) begin
+            // Insert value at the appropriate index
+            index = (head_q + run) % `BLOCK_BUFF_SIZE;
+            buffer_d[index] = vli_value;
+
+            // Update head pointer
+            head_d = (head_q + run + 1) % `BLOCK_BUFF_SIZE;
+
+            // Check end-of-block condition
+            if ((vli_value == 12'sd0 && run == 4'd0) || (head_d == 0)) begin
+                if (freq) begin
+                    clear_d = 1'b1;
+                    head_d  = '0;
+                end
             end
         end
     end
-end
 
-always_ff @(posedge clk) begin
-    if (rst) begin
-        buffer <= 0;
-        head <= 0;
-        clear <= 0;
-    end else begin
-        buffer <= buffer_n;
-        head <= head_n;
-        clear <= clear_n;
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            buffer_q <= '0;
+            head_q   <= '0;
+            clear_q  <= 1'b0;
+        end 
+        
+        else 
+        begin
+            buffer_q <= buffer_d;
+            head_q   <= head_d;
+            clear_q  <= clear_d;
+        end
     end
-end
 
 endmodule
