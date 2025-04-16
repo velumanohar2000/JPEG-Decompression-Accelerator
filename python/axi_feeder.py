@@ -5,7 +5,6 @@ from pathlib import Path
 imageName = sys.argv[1]                     # e.g., "charcoal_cat"
 imageName = imageName.split(".")[0]         # Remove extension if present
 imgName = f"../images/{imageName}.jpg"      # Image path
-outFolder = imageName                       # Output folder or base name
 
 ######## USER - CONFIGURE PARAMETERS ###########
 outType = "bin32"  # Options: "binary", "bin32", "hex"
@@ -42,12 +41,11 @@ def write_svh(words, mode, out_path, array_name="jpeg_data"):
 
         f.write("};\n")
 
-
 # ---- Main Execution ----
 def main():
     input_path = Path(imgName)
     if not input_path.exists():
-        print(f"Error: File not found at {input_path}")
+        print(f"Error: File not found at {input_path.resolve()}")
         sys.exit(1)
 
     # Read image
@@ -55,17 +53,14 @@ def main():
         data = f.read()
 
     words = bytes_to_words(data)
-    # Create output folder if it doesn't exist
-    out_dir = Path(outFolder)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Full output path: ./charcoal_cat/charcoal_cat.svh
-    out_path = out_dir / "segmented_raw.svh"
+    # CORRECTED PATH: exactly one folder up and into verilog/
+    out_path = Path("/home/mbutton/jpeg/verilog/segmented_raw.svh")
     print(f"Saving output to: {out_path.resolve()}")
-
 
     write_svh(words, outType, out_path)
     print(f"Generated {out_path} with {len(words)} 32-bit words in '{outType}' format.")
+
 
 if __name__ == "__main__":
     main()
