@@ -6,6 +6,7 @@
 `define Q  8                    // Precision (bits)
 `define DC_H 12                    // Max Size of DC Huffman table (number of entries)
 `define AC_H 162                    // Max Size of AC Huffman table (number of entries)
+`define MAX_HUFF_CODE_WIDTH 16  //Max huff code size
 `define H 162                     // Max Size of any Huffman table (num entries)
 `define HN 2                    // Number of Huffman table destinations/indexes
 `define CH 3                    // Number of channels in image
