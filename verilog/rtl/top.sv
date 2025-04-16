@@ -1,13 +1,11 @@
 `include "sys_defs.svh"
 
 module top (
-    //Inputs
     input logic clk, rst,
     input logic [`IN_BUS_WIDTH-1:0] data_in,
     input logic valid_in,
     input HUFF_PACKET hp,
     input QUANT_PACKET qp,
-    //Outputs
     output logic request,
     output logic unsigned [7:0] r [7:0][7:0],
     output logic unsigned [7:0] g [7:0][7:0],
@@ -70,19 +68,17 @@ assign blocks_in[2] = block_2_out;
 assign blocks_in[3] = block_1_out;
 
 supersample_top supersampling (
-    //in
     .clk(clk),
     .rst(rst),
     .valid_in(valid_out_Idct),
     .ch_in(ch_Idct),
     .block_in(idct_out),
-    //out
     .block_1_out(block_1_out),
     .block_2_out(block_2_out),
     .block_3_out(block_3_out),
     .block_4_out(block_4_out),
     .ch_out(ch_out_Super),
-    .valid_out(valid_out_Super)   // 4 bits
+    .valid_out(valid_out_Super)
 );
 
 logic [`Q-1:0] y_out [7:0][7:0];
@@ -118,11 +114,5 @@ ycbcr2rgb_block color_conversion (
     .b(b),
     .valid_out(valid_out_Color)
 );
-
-// assign r = y_out;
-// assign g = cb_out;
-// assign b = cr_out;
-// assign valid_out_Color = valid_out_Buffer;
-
 
 endmodule
