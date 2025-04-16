@@ -1,581 +1,190 @@
 module loeffler_idct
+#(parameter DATA_WIDTH = 64)
 (
     input  logic clk,
     input  logic rst,
     input  logic valid_in,
     input  logic [1:0] channel_in,
-    input  logic signed [63:0] idct_in  [7:0],
-    output logic signed [63:0] idct_out [7:0],
+    input  logic signed [DATA_WIDTH-1:0] idct_in [7:0],
+    output logic signed [DATA_WIDTH-1:0] idct_out [7:0],
     output logic [1:0] channel_out,
     output logic valid_out
 );
 
-    logic stage1_valid_out;
-    logic stage2_valid_out;
-    logic stage3_valid_out;
-    logic stage4_valid_out;
-    logic stage5_valid_out;
-    logic stage6_valid_out;
-    logic stage7_valid_out;
+    logic signed [DATA_WIDTH-1:0] x [0:9];
+    logic signed [DATA_WIDTH-1:0] y [0:9];
+    logic signed [DATA_WIDTH-1:0] z [0:9];
+    logic signed [DATA_WIDTH-1:0] w [0:9];
+    logic signed [DATA_WIDTH-1:0] a [0:9];
+    logic signed [DATA_WIDTH-1:0] b [0:9];
+    logic signed [DATA_WIDTH-1:0] c [0:9];
+    logic signed [DATA_WIDTH-1:0] d [7:0];
+    logic signed [DATA_WIDTH-1:0] e [7:0];
 
-    logic [1:0] stage1_channel_out;
-    logic [1:0] stage2_channel_out;
-    logic [1:0] stage3_channel_out;
-    logic [1:0] stage4_channel_out;
-    logic [1:0] stage5_channel_out;
-    logic [1:0] stage6_channel_out;
-    logic [1:0] stage7_channel_out;
-
-    logic stage1_valid_in;
-    logic [1:0] channel_in_reg;
-
-    logic signed [63:0] stage1_in  [7:0];
-    logic signed [63:0] stage1_out [7:0];
-    logic signed [63:0] stage2_out [8:0];
-    logic signed [63:0] stage3_out [8:0];
-    logic signed [63:0] stage4_out [8:0];
-    logic signed [63:0] stage5_out [9:0];
-    logic signed [63:0] stage6_out [9:0];
-    logic signed [63:0] stage7_out [7:0];
+    logic [1:0] ch_1, ch_2, ch_3, ch_4, ch_5, ch_6, ch_7, ch_8;
+    logic v_1, v_2, v_3, v_4, v_5, v_6, v_7, v_8;
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 8; i++) stage1_in[i] <= '0;
-            stage1_valid_in <= '0;
-            channel_in_reg <= '0;
+        if (rst) begin
+            for (int i = 0; i < 8; i++) x[i] <= '0;
+            ch_1 <= 0;
+            v_1 <= 0;
+        end else begin
+            x[0] <= idct_in[0];
+            x[1] <= idct_in[4];
+            x[2] <= idct_in[2];
+            x[3] <= idct_in[6];
+            x[4] <= idct_in[7];
+            x[5] <= ((idct_in[3] << 8) + (idct_in[3] << 6) + (idct_in[3] << 5) + (idct_in[3] << 3) + (idct_in[3] << 1));
+            x[6] <= ((idct_in[5] << 8) + (idct_in[5] << 6) + (idct_in[5] << 5) + (idct_in[5] << 3) + (idct_in[5] << 1));
+            x[7] <= idct_in[1];
+            ch_1 <= channel_in;
+            v_1 <= valid_in;
         end
-        else begin
-            stage1_valid_in <= valid_in;
-            for(int i = 0; i < 8; i++) begin
-                stage1_in[i] <= idct_in[i];
-            end
-            channel_in_reg <= channel_in;
-        end
-    end
-
-    /****************** STAGE 1 *******************/
-
-    loeffler_idct_stage_1 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage1 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage1_valid_in),
-        .channel_in(channel_in_reg),
-        .x_in_reversed(stage1_in),
-        .y_out(stage1_out),
-        .channel_out(stage1_channel_out),
-        .valid_out(stage1_valid_out)
-    );
-
-
-    /****************** STAGE 2 *******************/
-
-    loeffler_idct_stage_2 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage2 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage1_valid_out),
-        .channel_in(stage1_channel_out),
-        .x_in(stage1_out),
-        .y_out(stage2_out),
-        .channel_out(stage2_channel_out),
-        .valid_out(stage2_valid_out)
-    );
-
-    /****************** STAGE 3 *******************/
-
-    loeffler_idct_stage_3 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage3 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage2_valid_out),
-        .channel_in(stage2_channel_out),
-        .x_in(stage2_out),
-        .y_out(stage3_out),
-        .channel_out(stage3_channel_out),
-        .valid_out(stage3_valid_out)
-    );
-
-    /****************** STAGE 4 *******************/
-
-    loeffler_idct_stage_4 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage4 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage3_valid_out),
-        .channel_in(stage3_channel_out),
-        .x_in(stage3_out),
-        .y_out(stage4_out),
-        .channel_out(stage4_channel_out),
-        .valid_out(stage4_valid_out)
-    );
-
-    /****************** STAGE 5 *******************/
-
-    loeffler_idct_stage_5 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage5 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage4_valid_out),
-        .channel_in(stage4_channel_out),
-        .x_in(stage4_out),
-        .y_out(stage5_out),
-        .channel_out(stage5_channel_out),
-        .valid_out(stage5_valid_out)
-    );
-
-    /****************** STAGE 6 *******************/
-
-    loeffler_idct_stage_6 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage6 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage5_valid_out),
-        .channel_in(stage5_channel_out),
-        .x_in(stage5_out),
-        .y_out(stage6_out),
-        .channel_out(stage6_channel_out),
-        .valid_out(stage6_valid_out)
-    );
-
-    /****************** STAGE 7 *******************/
-
-    loeffler_idct_stage_7 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage7 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage6_valid_out),
-        .channel_in(stage6_channel_out),
-        .x_in(stage6_out),
-        .y_out(stage7_out),
-        .channel_out(stage7_channel_out),
-        .valid_out(stage7_valid_out)
-    );
-
-    /****************** STAGE 8 *******************/
-
-    loeffler_idct_stage_8 #(.INPUT_WIDTH(64), .OUTPUT_WIDTH(64)) stage8 (
-        .clk(clk),
-        .rst(rst),
-        .valid_in(stage7_valid_out),
-        .channel_in(stage7_channel_out),
-        .x_in(stage7_out),
-        .y_out(idct_out),
-        .channel_out(channel_out),
-        .valid_out(valid_out)
-    );
-
-endmodule: loeffler_idct
-
-// Checked
-module loeffler_idct_stage_1 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in_reversed  [7:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out          [7:0],
-    output logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [INPUT_WIDTH-1:0] x_in [7:0];
-
-    // Undo bit-reverse order
-    always_comb begin
-        x_in[0] = x_in_reversed[0];
-        x_in[1] = x_in_reversed[4];
-        x_in[2] = x_in_reversed[2];
-        x_in[3] = x_in_reversed[6];
-        x_in[4] = x_in_reversed[7];
-        x_in[5] = x_in_reversed[3];
-        x_in[6] = x_in_reversed[5];
-        x_in[7] = x_in_reversed[1];
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 8; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
+        if (rst) begin
+            y <= '{default: '0};
+            ch_2 <= 0;
+            v_2 <= 0;
+        end else begin
+            y[0] <= x[0];
+            y[1] <= x[1];
+            y[5] <= x[5];
+            y[6] <= x[6];
+            y[8] <= x[2] + x[3];
+            y[4] <= (x[7] - x[4]) << 8;
+            y[7] <= (x[7] + x[4]) << 8;
+            y[2] <= ((x[3] << 9) - (x[3] << 6) + (x[3] << 4) + (x[3] << 3) + x[3]);
+            y[3] <= ((x[2] << 7) + (x[2] << 6) + (x[2] << 2));
+            ch_2 <= ch_1;
+            v_2 <= v_1;
         end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-
-                y_out[0] <= x_in[0];
-                y_out[1] <= x_in[1];
-                y_out[2] <= x_in[2];
-                y_out[3] <= x_in[3];
-                y_out[4] <= x_in[4];
-                y_out[7] <= x_in[7];
-
-                // CSD Multiplication
-                // H = 001_0110_1010
-                y_out[5] <= ((x_in[5] << 8) + (x_in[5] << 6) + (x_in[5] << 5) + (x_in[5] << 3) + (x_in[5] << 1));
-                y_out[6] <= ((x_in[6] << 8) + (x_in[6] << 6) + (x_in[6] << 5) + (x_in[6] << 3) + (x_in[6] << 1));
-
-            end
-            else begin
-                for(int i = 0; i < 8; i++) y_out[i] <= '0;
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_1
-
-// Checked
-module loeffler_idct_stage_2 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [7:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [8:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [8:0];
-
-    always_comb begin
-                
-        // Passthrough signals
-        y_out_result[0] = x_in[0];
-        y_out_result[1] = x_in[1];
-        y_out_result[5] = x_in[5];
-        y_out_result[6] = x_in[6];
-
-        // Additions/Substractions
-        y_out_result[8] = (x_in[2] + x_in[3]);
-        y_out_result[4] = (x_in[7] - x_in[4]) << 8;
-        y_out_result[7] = (x_in[7] + x_in[4]) << 8;
-
-        // CSD Multiplication
-        // (C-F) = 000_1100_0100
-        // (C+F) = 010_0-101_1001
-        y_out_result[2] =  ((x_in[3] << 9) - (x_in[3] << 6) + (x_in[3] << 4) + (x_in[3] << 3) + x_in[3]);
-        y_out_result[3] =  ((x_in[2] << 7) + (x_in[2] << 6) + (x_in[2] << 2));
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 9; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
+        if (rst) begin
+            z <= '{default: '0};
+            ch_3 <= 0;
+            v_3 <= 0;
+        end else begin
+            z[0] <= y[0];
+            z[1] <= y[1];
+            z[2] <= y[2];
+            z[3] <= y[3];
+            z[4] <= y[4] + y[6];
+            z[5] <= y[7] - y[5];
+            z[6] <= y[4] - y[6];
+            z[7] <= y[7] + y[5];
+            z[8] <= ((y[8] << 7) + (y[8] << 3) + (y[8] << 1) + y[8]);
+            ch_3 <= ch_2;
+            v_3 <= v_2;
         end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 9; i++) y_out[i] <= y_out_result[i];
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_2
-
-// Checked
-module loeffler_idct_stage_3 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [8:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [8:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [8:0];
-    
-    always_comb begin
-
-        // Passthrough signals
-        y_out_result[0] = x_in[0];
-        y_out_result[1] = x_in[1];
-        y_out_result[2] = x_in[2];
-        y_out_result[3] = x_in[3];
-
-        // Additions/Substractions
-        y_out_result[4] = x_in[4] + x_in[6];
-        y_out_result[5] = x_in[7] - x_in[5];
-        y_out_result[6] = x_in[4] - x_in[6];
-        y_out_result[7] = x_in[7] + x_in[5];
-
-        // CSD Multiplication
-        // F = 000_1000_1011
-        y_out_result[8] = ((x_in[8] << 7) + (x_in[8] << 3) + (x_in[8] << 1) + x_in[8]);
-
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 9; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
+        if (rst) begin
+            w <= '{default: '0};
+            ch_4 <= 0;
+            v_4 <= 0;
+        end else begin
+            w[0] <= z[0];
+            w[1] <= z[1];
+            w[5] <= z[5];
+            w[6] <= z[6];
+            w[2] <= z[8] - z[2];
+            w[3] <= z[8] + z[3];
+            w[8] <= z[4] + z[7];
+            w[7] <= (-(z[4] << 6) - (z[4] << 3) + z[4]);
+            w[4] <= ((z[7] << 8) + (z[7] << 6) + (z[7] << 5) + (z[7] << 1) + z[7]);
+            ch_4 <= ch_3;
+            v_4 <= v_3;
         end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 9; i++) y_out[i] <= y_out_result[i];
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_3
-
-// Checked
-module loeffler_idct_stage_4 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [8:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [8:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [8:0];
-
-    always_comb begin
-
-        // Passthrough signals
-        y_out_result[0] = x_in[0];
-        y_out_result[1] = x_in[1];
-        y_out_result[5] = x_in[5];
-        y_out_result[6] = x_in[6];
-
-        // Additions/Substractions
-        y_out_result[2] = x_in[8] - x_in[2];
-        y_out_result[3] = x_in[8] + x_in[3];
-        y_out_result[8] = x_in[4] + x_in[7];
-
-        // CSD Multiplications
-        // (E-D) = 111_1100_-1001
-        // (E+D) = 001_0110_0011
-        y_out_result[7] = (-(x_in[4] << 6) - (x_in[4] << 3) + x_in[4]);
-        y_out_result[4] = ((x_in[7] << 8) + (x_in[7] << 6) + (x_in[7] << 5) + (x_in[7] << 1) + x_in[7]);
-
-    end
-    
-   always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 9; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
-        end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 9; i++) y_out[i] <= y_out_result[i];
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_4
-
-
-// Checked
-module loeffler_idct_stage_5 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [8:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [9:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [9:0];
-
-    always_comb begin
-
-        // Passthrough signals
-        y_out_result[0] = x_in[0];
-        y_out_result[1] = x_in[1];
-        y_out_result[2] = x_in[2];
-        y_out_result[3] = x_in[3];
-        y_out_result[4] = x_in[4];
-        y_out_result[7] = x_in[7];
-        y_out_result[8] = x_in[8];
-
-        // Additions/Subtractions
-        y_out_result[9] = x_in[5] + x_in[6];
-
-        // CSD Multiplication
-        // (G+B) = 001_0010_1101
-        // (G-B) = 111_0011_100-1
-        y_out_result[5] = ((x_in[6] <<  8) + (x_in[6] << 5) + (x_in[6] << 3) + (x_in[6] << 2) + x_in[6]);
-        y_out_result[6] = (-(x_in[5] << 8) + (x_in[5] << 5) + (x_in[5] << 4) + (x_in[5] << 3) - x_in[5]);
-
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 10; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
+        if (rst) begin
+            a <= '{default: '0};
+            ch_5 <= 0;
+            v_5 <= 0;
+        end else begin
+            a[0] <= w[0];
+            a[1] <= w[1];
+            a[2] <= w[2];
+            a[3] <= w[3];
+            a[4] <= w[4];
+            a[7] <= w[7];
+            a[8] <= w[8];
+            a[9] <= w[5] + w[6];
+            a[5] <= ((w[6] << 8) + (w[6] << 5) + (w[6] << 3) + (w[6] << 2) + w[6]);
+            a[6] <= (-(w[5] << 8) + (w[5] << 5) + (w[5] << 4) + (w[5] << 3) - w[5]);
+            ch_5 <= ch_4;
+            v_5 <= v_4;
         end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 10; i++) y_out[i] <= y_out_result[i];
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_5
-
-
-// Checked
-module loeffler_idct_stage_6 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [9:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [9:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [9:0];
-
-    always_comb begin
-
-        // Additions/Substractions
-        y_out_result[0] = x_in[0] + x_in[1];
-        y_out_result[1] = x_in[0] - x_in[1];
-
-        // Shifting
-        y_out_result[2] = x_in[2] >>> 8;
-        y_out_result[3] = x_in[3] >>> 8;
-
-        // Passthrough signals
-        y_out_result[4] = x_in[4];
-        y_out_result[5] = x_in[5];
-        y_out_result[6] = x_in[6];
-        y_out_result[7] = x_in[7];
-
-        // CSD Multiplications
-        // D = 000_1101_0101
-        // B = 001_0000_-1011
-        y_out_result[8] = ((x_in[8] << 7) + (x_in[8] << 6) + (x_in[8] << 4) + (x_in[8] << 2) + x_in[8]);
-        y_out_result[9] = ((x_in[9] << 8) - (x_in[9] << 3) + (x_in[9] << 1) + x_in[9]);
-
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 10; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
+        if (rst) begin
+            b <= '{default: '0};
+            ch_6 <= 0;
+            v_6 <= 0;
+        end else begin
+            b[0] <= a[0] + a[1];
+            b[1] <= a[0] - a[1];
+            b[2] <= a[2] >>> 8;
+            b[3] <= a[3] >>> 8;
+            b[4] <= a[4];
+            b[5] <= a[5];
+            b[6] <= a[6];
+            b[7] <= a[7];
+            b[8] <= ((a[8] << 7) + (a[8] << 6) + (a[8] << 4) + (a[8] << 2) + a[8]);
+            b[9] <= ((a[9] << 8) - (a[9] << 3) + (a[9] << 1) + a[9]);
+            ch_6 <= ch_5;
+            v_6 <= v_5;
         end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 10; i++) y_out[i] <= y_out_result[i];
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_6
-
-// Checked
-module loeffler_idct_stage_7 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [9:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [7:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [7:0];
-
-    always_comb begin
-
-        // Additions/Substractions
-        y_out_result[0] = (x_in[0] + x_in[3]);
-        y_out_result[1] = (x_in[1] + x_in[2]);
-        y_out_result[2] = (x_in[1] - x_in[2]);
-        y_out_result[3] = (x_in[0] - x_in[3]);
-        y_out_result[4] = (x_in[8] - x_in[4]) >>> 16;
-        y_out_result[5] = (x_in[9] - x_in[5]) >>> 16;
-        y_out_result[6] = (x_in[9] + x_in[6]) >>> 16;
-        y_out_result[7] = (x_in[8] + x_in[7]) >>> 16;
-        
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 8; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
+        if (rst) begin
+            c <= '{default: '0};
+            ch_7 <= 0;
+            v_7 <= 0;
+        end else begin
+            c[0] <= b[0] + b[3];
+            c[1] <= b[1] + b[2];
+            c[2] <= b[1] - b[2];
+            c[3] <= b[0] - b[3];
+            c[4] <= (b[8] - b[4]) >>> 16;
+            c[5] <= (b[9] - b[5]) >>> 16;
+            c[6] <= (b[9] + b[6]) >>> 16;
+            c[7] <= (b[8] + b[7]) >>> 16;
+            ch_7 <= ch_6;
+            v_7 <= v_6;
         end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 8; i++) y_out[i] <= y_out_result[i];
-            end
-        end
-    end
-
-endmodule: loeffler_idct_stage_7
-
-// Checked
-module loeffler_idct_stage_8 #(parameter INPUT_WIDTH, parameter OUTPUT_WIDTH)
-(
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in,
-    input  logic [1:0] channel_in,
-    input  logic signed [INPUT_WIDTH-1:0]  x_in  [7:0],
-    output logic signed [OUTPUT_WIDTH-1:0] y_out [7:0],
-    output  logic [1:0] channel_out,
-    output logic valid_out
-);
-
-    logic signed [OUTPUT_WIDTH-1:0] y_out_result [7:0];
-
-    always_comb begin
-
-        // Additions/Substractions
-        y_out_result[0] = x_in[0] + x_in[7];
-        y_out_result[1] = x_in[1] + x_in[6];
-        y_out_result[2] = x_in[2] + x_in[5];
-        y_out_result[3] = x_in[3] + x_in[4];
-        y_out_result[4] = x_in[3] - x_in[4];
-        y_out_result[5] = x_in[2] - x_in[5];
-        y_out_result[6] = x_in[1] - x_in[6];
-        y_out_result[7] = x_in[0] - x_in[7];
-
     end
 
     always_ff @(posedge clk) begin
-        if(rst) begin
-            for(int i = 0; i < 8; i++) y_out[i] <= '0;
-            valid_out   <= '0;
-            channel_out <= '0;
-        end
-        else begin
-            valid_out   <= valid_in;
-            channel_out <= channel_in;
-            if(valid_in) begin
-                for(int i = 0; i < 8; i++) y_out[i] <= y_out_result[i];
-            end
+        if (rst) begin
+            d <= '{default: '0};
+            ch_8 <= 0;
+            v_8 <= 0;
+        end else begin
+            d[0] <= c[0] + c[7];
+            d[1] <= c[1] + c[6];
+            d[2] <= c[2] + c[5];
+            d[3] <= c[3] + c[4];
+            d[4] <= c[3] - c[4];
+            d[5] <= c[2] - c[5];
+            d[6] <= c[1] - c[6];
+            d[7] <= c[0] - c[7];
+            ch_8 <= ch_7;
+            v_8 <= v_7;
         end
     end
 
-endmodule: loeffler_idct_stage_8
+    assign idct_out = d;
+    assign channel_out = ch_8;
+    assign valid_out = v_8;
+
+endmodule
