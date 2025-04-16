@@ -26,22 +26,19 @@ module top_tb;
     ////////////////////////////////////////////////////////////////////////////
 
     //Instantiate Top module
-    top dut (
-        //Inputs
-        .clk, .rst,
+    jpeg_decoder_top dut (
+        .clk, 
+        .rst,
         .data_in,
         .valid_in,
         .hp,
         .qp,
-        //Outputs
         .request,
         .r,
         .g,
         .b,
         .valid_out_Color
     );
-
-    // import displays::*;
 
     integer file_ptr, scan_len;
     integer curr_row, tab_idx;

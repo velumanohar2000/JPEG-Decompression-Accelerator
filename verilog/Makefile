@@ -2,7 +2,7 @@ VCS = vcs -kdb -sverilog -debug_access+all+reverse
 
 TB = top_tb.sv
 TB_LIBS = displays.sv
-RTL = huffman_decoder.sv vli_decoder.sv input_buffer.sv entropy_decoding.sv deQuant.sv top.sv loeffler_idct.sv loeffler2d_idct.sv supersample_8x8.sv supersample_top.sv channel_buffer.sv ycbcr2rgb_block.sv ycbcr2rgb.sv
+RTL = huffman_decoder.sv input_buffer.sv entropy_decoding.sv deQuant.sv jpeg_decoder_top.sv loeffler_idct.sv loeffler2d_idct.sv supersample_8x8.sv supersample.sv channel_buffer.sv YCbCr_to_RGB_8x8.sv
 
 DEFS = sys_defs.svh
 

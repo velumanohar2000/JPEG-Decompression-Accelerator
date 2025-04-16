@@ -246,3 +246,33 @@ end
 
 endmodule
 
+module vli_decoder (
+    input  logic [3:0]  size,
+    input  logic [10:0] symbol_in,
+    output logic signed [11:0] value
+);
+
+logic signed [11:0] temp_symbol;
+
+always_comb begin
+    value = 12'sd0;
+
+    if (size != 0) begin
+        // Reverse the bits
+        temp_symbol = 0;
+        for (int i = 0; i < size; i++) begin
+            temp_symbol[size - 1 - i] = symbol_in[i];
+        end
+
+        if (!temp_symbol[size - 1]) begin
+            // Negative number: perform proper sign-extension of (symbol + 1), negate
+            value = -((12'sd1 << size) - 1 - temp_symbol);
+        end else begin
+            // Positive number: just forward it
+            value = temp_symbol;
+        end
+    end
+end
+
+endmodule
+
