@@ -12,7 +12,6 @@ resultDir = "out/" + baseName
 outputFormat = "bin32" #Options: "binary" = one long string, "bin32" = lines of 32 bits, "hex" = lines of 32 hex
 ################################################
 
-####### Matrix Transformation Functions (Originally from functions.py) ###########
 def convertFlatToNested(flatArray):
     """Convert a 1D array to a 2D square array"""
     dimension = int(math.sqrt(len(flatArray)))
@@ -25,7 +24,6 @@ def convertNestedToFlat(nestedArray):
         flatArray.extend(row)
     return flatArray
 
-####### BitStream Handling (Originally part of huffman.py) ###########
 class BinaryDataStream:
     """Handle streaming bits from a binary string"""
     def __init__(self, binaryData):
@@ -50,7 +48,6 @@ class BinaryDataStream:
         """Check if we've reached end of data"""
         return self.currentIndex >= len(self.binaryData)
 
-####### Huffman Encoding/Decoding (Originally from huffman.py) ###########
 class HuffmanCodec:
     """Implementation of Huffman encoding/decoding"""
     def __init__(self):

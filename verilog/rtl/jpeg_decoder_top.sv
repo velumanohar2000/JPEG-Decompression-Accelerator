@@ -88,7 +88,7 @@ module jpeg_decoder_top (
     );
 
     // 2D IDCT
-    loeffler2d_idct idct (
+    loeffler2d_idct_new idct (
         .clk(clk), .rst(rst),
         .valid_in(valid_dequant),
         .channel_in(ch_dequant),
