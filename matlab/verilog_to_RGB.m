@@ -3,12 +3,12 @@ clear; close all;
 % --------------------------
 % Load image name from file
 % --------------------------
-imgNameFile = fopen('../python/imageName.txt','r');
-imageName = fscanf(imgNameFile,'%s\n',1);
-fclose(imgNameFile);
+ imgNameFile = fopen('../python/imageName.txt','r');
+ imageName = fscanf(imgNameFile,'%s\n',1);
+ fclose(imgNameFile);
 
 % Manual override (optional)
-% imageName = 'smallCat';
+% imageName = 'spidey3';
 
 % --------------------------
 % Read Header Info
@@ -62,17 +62,24 @@ end
 
 % --------------------------
 % Crop and display results
-% --------------------------
-finalCropped = finalImg(1:height, 1:width, :);
 
-figure(1); imshow(finalImg);
+figure(2); imshow(finalImg);
 title('Image (Uncropped)');
 
-figure(2);
-subplot(1,2,1); imshow(finalCropped); title('Verilog');
 
+
+
+finalCropped = finalImg(1:height, 1:width, :);
+
+figure(1);
+subplot(1,2,1); imshow(finalCropped); title('Decoded Image using Hardware Accelerator');
+
+tic;
 matlabRef = imread(fullfile('..', 'images', [imageName, '.jpg']));
-subplot(1,2,2); imshow(matlabRef); title('MATLAB');
+elapsedTime = toc;
+fprintf('Elapsed time: %.6f seconds\n', elapsedTime);
+
+subplot(1,2,2); imshow(matlabRef); title('Decoded Image using MATLAB');
 
 % --------------------------
 % Compute error analysis
@@ -86,15 +93,6 @@ maxDelta = maxPos + maxNeg;
 
 avgDelta = squeeze(mean(mean(posError + negError, 1), 2));
 
-pause(1);
-figure(3);
-imshow(uint8(255 * bsxfun(@rdivide, max(posError, 0), reshape(maxPos, 1, 1, 3))), []);
-title('Spots where Verilog is brighter');
-
-pause(1);
-figure(4);
-imshow(uint8(255 * bsxfun(@rdivide, max(negError, 0), reshape(maxNeg, 1, 1, 3))), []);
-title('Spots where MATLAB is brighter');
 
 % --------------------------
 % PSNR Calculation

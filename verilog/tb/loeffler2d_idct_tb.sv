@@ -11,7 +11,7 @@ module loeffler2d_idct_tb;
   // two input blocks
   logic signed [11:0] idct_in_mem  [7:0][7:0];
   logic signed [11:0] idct_in_mem2 [7:0][7:0];
-
+  logic signed [11:0] idct_in_mem3 [7:0][7:0];
   // muxed into this
   logic signed [11:0] idct_in      [7:0][7:0];
   logic unsigned [7:0] idct_out    [7:0][7:0];
@@ -31,7 +31,8 @@ module loeffler2d_idct_tb;
     initial begin
         for (int r = 0; r < 8; r++) begin
             for (int c = 0; c < 8; c++) begin
-                idct_in_mem2[r][c] = 12'd2;
+                idct_in_mem2[r][c] = r;
+                idct_in_mem3[r][c] = r + 8;
             end
         end
     end
@@ -66,6 +67,8 @@ module loeffler2d_idct_tb;
       for (int col = 0; col < 8; col++) begin
         if (valid_count == 2)
           idct_in[row][col] = idct_in_mem2[row][col];
+        else if (valid_count == 3)
+          idct_in[row][col] = idct_in_mem3[row][col];
         else
           idct_in[row][col] = idct_in_mem[row][col];
       end
@@ -97,16 +100,20 @@ module loeffler2d_idct_tb;
       valid_in = 0;
       @(posedge clk);
     end
+    wait_cycles(10);
+    @(posedge clk);
+    valid_in = 1;
+    @(posedge clk);
+    valid_in = 0;
 
     // wait for each output block and display it
     repeat (2) begin
       wait (valid_out == 1);
-
       disp_block();
-    @(posedge clk);
-
+      // @(posedge clk);
     end
 
+    wait_cycles(100);
     $finish;
   end
 

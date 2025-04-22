@@ -52,6 +52,9 @@ module jpeg_decoder_top (
     logic [`Q-1:0] cr [7:0][7:0];
     logic valid_buffer;
 
+    int cnt_input;
+    int cnt_output;
+
     // Block ordering (JPEG block scan order)
     assign blocks_in[0] = block4;
     assign blocks_in[1] = block3;
@@ -88,7 +91,7 @@ module jpeg_decoder_top (
     );
 
     // 2D IDCT
-    loeffler2d_idct_new idct (
+    loeffler2d_idct idct (
         .clk(clk), .rst(rst),
         .valid_in(valid_dequant),
         .channel_in(ch_dequant),
@@ -129,7 +132,8 @@ module jpeg_decoder_top (
 
     // Final Color Conversion
     YCbCr_to_RGB_8x8 color_conversion (
-        .clk(clk), .rst(rst),
+        .clk(clk), 
+        .rst(rst),
         .valid_in(valid_buffer),
         .y(y),
         .cb(cb),
@@ -139,5 +143,9 @@ module jpeg_decoder_top (
         .b(b),
         .valid_out(valid_out_Color)
     );
+
+
+
+
 
 endmodule
