@@ -21,21 +21,20 @@ module loeffler2d_idct_tb;
 
   // load both blocks
   initial begin
-    finput = $fopen("../verilog/tb/idct_input_block2.txt", "r");
+    finput = $fopen("../verilog/tb/idct_input_block.txt", "r");
     for (int r = 0; r < 8; r++)
       for (int c = 0; c < 8; c++)
         $fscanf(finput, "%d\n", idct_in_mem[r][c]);
   end
 
-    // block3 = all 2’s
-    initial begin
-        for (int r = 0; r < 8; r++) begin
-            for (int c = 0; c < 8; c++) begin
-                idct_in_mem2[r][c] = r;
-                idct_in_mem3[r][c] = r + 8;
-            end
-        end
-    end
+  initial begin
+      for (int r = 0; r < 8; r++) begin
+          for (int c = 0; c < 8; c++) begin
+              idct_in_mem2[r][c] = r;
+              idct_in_mem3[r][c] = r + 8;
+          end
+      end
+  end
 
 
   // instantiate DUT
@@ -110,7 +109,6 @@ module loeffler2d_idct_tb;
     repeat (2) begin
       wait (valid_out == 1);
       disp_block();
-      // @(posedge clk);
     end
 
     wait_cycles(100);

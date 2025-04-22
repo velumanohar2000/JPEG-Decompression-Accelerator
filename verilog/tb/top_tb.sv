@@ -119,8 +119,6 @@ module top_tb;
             end
         end
 
-        // wait_cycles(10000);
-
         // Cleanup
         $fclose(r_file);
         $fclose(g_file);
@@ -128,74 +126,6 @@ module top_tb;
         $finish;
     end
 
-    // always_ff @( posedge clk) begin
-    //     if (rst) 
-    //         cnt_output <= 0;        
-    //     if (dut.valid_idct) begin
-    //         $display("OUTPUT %1d", cnt_output);
-    //         for (int r = 0; r < 8; r++) begin
-    //             for (int c = 0; c < 8; c++)
-    //                 $write("%4d ", dut.idct_out[r][c]);
-    //             $write("\n");
-    //             end
-    //             $write("\n");
-    //             cnt_output <= cnt_output + 1;
-    //     end
-    // end
-
-    // always_ff @( posedge clk) begin
-    //     if (rst) 
-    //         cnt_input <= 0;
-    //     if (dut.valid_dequant) begin
-    //         $display("INPUT %1d", cnt_input);
-    //         for (int r = 0; r < 8; r++) begin
-    //             for (int c = 0; c < 8; c++)
-    //                 $write("%4d ", dut.block_dequant[r][c]);
-    //             $write("\n");
-    //             end
-    //             $write("\n");
-    //             cnt_input <= cnt_input + 1;
-    //     end
-    // end
-
-    // always_ff @( posedge clk) begin
-    //     if (rst) 
-    //         cnt_output <= 0;
-    //     if (dut.idct.stage1_valid_out) begin
-    //         $display("STAGE 1 OUT %1d", cnt_output);
-    //         for (int r = 0; r < 8; r++) begin
-    //             for (int c = 0; c < 8; c++)
-    //                 $write("%4d ", dut.idct.stage1_block_out[r][c]);
-    //             $write("\n");
-    //             end
-    //             $write("\n");
-    //             cnt_output <= cnt_output + 1;
-    //     end
-    // end
-
-    // Print stage 2
-    // always_ff @( posedge clk) begin
-    //     if (rst) begin
-    //         cnt_output <= 0;
-    //         cnt_stage2_input <= 0;
-    //     end
-    //     else begin
-    //         if (dut.idct.stage1_valid_out) begin
-    //             cnt_stage2_input <= cnt_stage2_input + 1;
-    //         end
-    //         if (dut.idct.stage2_valid_out) begin
-    //             $display("STAGE 2 OUT %1d", cnt_output);
-    //             for (int r = 0; r < 8; r++) begin
-    //                 for (int c = 0; c < 8; c++)
-    //                     $write("%4d ", dut.idct.stage2_block_out[r][c]);
-    //                 $write("\n");
-    //                 end
-    //                 $write("\n");
-    //                 cnt_output <= cnt_output + 1;
-    //         end            
-    //     end
-
-    // end
 
     //------------------------------//
     // TASKS
