@@ -8,7 +8,7 @@ clear; close all;
  fclose(imgNameFile);
 
 % Manual override (optional)
-% imageName = 'spidey3';
+% imageName = 'spider-man';
 
 % --------------------------
 % Read Header Info
