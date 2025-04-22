@@ -1,6 +1,0 @@
-Command exited with non-zero status 255
-{"vcs1":{"timestamp_begin":1745039247.997773645, "rt":3.61, "ut":1.53, "st":0.40}}
-{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1745039247.166018950}
-{"VCS_COMP_START_TIME": 1745039247.166018950}
-{"VCS_COMP_END_TIME": 1745039251.797232852}
-{"VCS_USER_OPTIONS": "-kdb -sverilog -debug_access+all+reverse tb/displays.sv tb/loeffler2d_idct_tb.sv rtl/huffman_decoder.sv rtl/input_buffer.sv rtl/entropy_decoding.sv rtl/deQuant.sv rtl/jpeg_decoder_top.sv rtl/loeffler_idct.sv rtl/loeffler2d_idct.sv rtl/supersample_8x8.sv rtl/supersample.sv rtl/channel_buffer.sv rtl/YCbCr_to_RGB_8x8.sv rtl/loeffler2d_idct_new.sv sys_defs.svh -o simv"}
