@@ -2,22 +2,22 @@
 ****************************************
 Report : qor
 Design : top
-Version: T-2022.03-SP3
-Date   : Fri Dec  6 22:32:49 2024
+Version: V-2023.12-SP5
+Date   : Wed Apr 23 15:05:20 2025
 ****************************************
 
 
   Timing Path Group 'core_clk'
   -----------------------------------
-  Levels of Logic:              68.00
-  Critical Path Length:          8.96
-  Critical Path Slack:           0.03
-  Critical Path Clk Period:     10.00
+  Levels of Logic:              64.00
+  Critical Path Length:          7.90
+  Critical Path Slack:           0.19
+  Critical Path Clk Period:      9.00
   Total Negative Slack:          0.00
   No. of Violating Paths:        0.00
-  Worst Hold Violation:         -0.85
-  Total Hold Violation:        -67.20
-  No. of Hold Violations:       87.00
+  Worst Hold Violation:         -0.74
+  Total Hold Violation:        -59.50
+  No. of Hold Violations:       86.00
   -----------------------------------
 
 
@@ -25,41 +25,41 @@ Date   : Fri Dec  6 22:32:49 2024
   -----------------------------------
   Hierarchical Cell Count:          0
   Hierarchical Port Count:          0
-  Leaf Cell Count:               4784
-  Buf/Inv Cell Count:            1982
-  Buf Cell Count:                  22
-  Inv Cell Count:                1960
+  Leaf Cell Count:               4325
+  Buf/Inv Cell Count:            1943
+  Buf Cell Count:                   3
+  Inv Cell Count:                1940
   CT Buf/Inv Cell Count:            0
-  Combinational Cell Count:      4697
-  Sequential Cell Count:           87
+  Combinational Cell Count:      4239
+  Sequential Cell Count:           86
   Macro Count:                      0
   -----------------------------------
 
 
   Area
   -----------------------------------
-  Combinational Area:     9541.074048
-  Noncombinational Area:   576.398611
-  Buf/Inv Area:           2558.467660
-  Total Buffer Area:            48.80
-  Total Inverter Area:        2509.67
+  Combinational Area:     8465.028335
+  Noncombinational Area:   572.332306
+  Buf/Inv Area:           2476.633290
+  Total Buffer Area:             6.10
+  Total Inverter Area:        2470.53
   Macro/Black Box Area:      0.000000
-  Net Area:               3533.407109
+  Net Area:               2797.394333
   -----------------------------------
-  Cell Area:             10117.472658
-  Design Area:           13650.879767
+  Cell Area:              9037.360641
+  Design Area:           11834.754974
 
 
   Design Rules
   -----------------------------------
-  Total Number of Nets:          7341
-  Nets With Violations:           546
-  Max Trans Violations:           546
+  Total Number of Nets:          6900
+  Nets With Violations:           548
+  Max Trans Violations:           548
   Max Cap Violations:               0
   -----------------------------------
 
 
-  Hostname: ggbl2517p08.engin.umich.edu
+  Hostname: dc3swp35.dc.umich.edu
 
   Compile CPU Statistics
   -----------------------------------------
@@ -67,15 +67,15 @@ Date   : Fri Dec  6 22:32:49 2024
   Logic Optimization:                  0.00
   Mapping Optimization:                0.00
   -----------------------------------------
-  Overall Compile Time:                4.58
-  Overall Compile Wall Clock Time:     1.51
+  Overall Compile Time:                2.62
+  Overall Compile Wall Clock Time:     1.09
 
   --------------------------------------------------------------------
 
   Design  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
 
 
-  Design (Hold)  WNS: 0.85  TNS: 67.20  Number of Violating Paths: 87
+  Design (Hold)  WNS: 0.74  TNS: 59.50  Number of Violating Paths: 86
 
   --------------------------------------------------------------------
 

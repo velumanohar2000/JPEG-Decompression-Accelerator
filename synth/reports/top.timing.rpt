@@ -7,16 +7,16 @@ Report : timing
         -max_paths 1
         -transition_time
 Design : top
-Version: T-2022.03-SP3
-Date   : Fri Dec  6 22:32:49 2024
+Version: V-2023.12-SP5
+Date   : Wed Apr 23 15:05:20 2025
 ****************************************
 
 Operating Conditions: tt1p05v25c   Library: saed32rvt_tt1p05v25c
 Wire Load Model Mode: enclosed
 
-  Startpoint: deHuffer_ibuff_head_reg_4_
+  Startpoint: deHuffer_ibuff_head_reg_5_
               (rising edge-triggered flip-flop clocked by core_clk)
-  Endpoint: deHuffer_block_buff_head_reg_2_
+  Endpoint: deHuffer_block_buff_head_reg_3_
             (rising edge-triggered flip-flop clocked by core_clk)
   Path Group: core_clk
   Path Type: max
@@ -33,163 +33,155 @@ Attributes:
     i - ideal_net or ideal_network
   inf - infeasible path
 
-  Point                                       Fanout     Trans      Incr       Path      Attributes
-  ---------------------------------------------------------------------------------------------------------
-  clock core_clk (rise edge)                                        0.00       0.00
-  clock network delay (ideal)                                       0.20       0.20
-  deHuffer_ibuff_head_reg_4_/CLK (DFFX2_RVT)              0.08      0.00       0.20 r
-  deHuffer_ibuff_head_reg_4_/Q (DFFX2_RVT)                0.14      0.26       0.46 f
-  deHuffer_ibuff_head_4_ (net)                 17                   0.00       0.46 f
-  U101118/Y (MUX41X1_RVT)                                 0.03      0.92       1.39 f
-  n84980 (net)                                  2                   0.00       1.39 f
-  U100978/Y (AO22X1_RVT)                                  0.03      0.12       1.50 f
-  n84944 (net)                                  2                   0.00       1.50 f
-  U101158/Y (AO222X1_RVT)                                 0.03      0.13       1.63 f
-  n84991 (net)                                  2                   0.00       1.63 f
-  U100860/Y (INVX0_RVT)                                   0.01      0.08       1.70 r
-  n84946 (net)                                  1                   0.00       1.70 r
-  U101159/Y (OAI222X1_RVT)                                0.02      0.08       1.78 f
-  n84957 (net)                                  2                   0.00       1.78 f
-  U101160/Y (AO222X1_RVT)                                 0.08      0.17       1.96 f
-  n86161 (net)                                  9                   0.00       1.96 f
-  U101161/Y (INVX1_RVT)                                   0.03      0.18       2.14 r
-  n86249 (net)                                  8                   0.00       2.14 r
-  U101162/Y (AO21X1_RVT)                                  0.01      0.05       2.19 r
-  n84963 (net)                                  2                   0.00       2.19 r
-  U101173/Y (OA221X1_RVT)                                 0.01      0.06       2.25 r
-  n85016 (net)                                  1                   0.00       2.25 r
-  U97698/Y (NAND4X0_RVT)                                  0.05      0.07       2.32 f
-  n85153 (net)                                  1                   0.00       2.32 f
-  U97608/Y (OR2X1_RVT)                                    0.06      0.16       2.47 f
-  n85712 (net)                                  6                   0.00       2.47 f
-  U101302/Y (INVX1_RVT)                                   0.02      0.14       2.61 r
-  n85701 (net)                                  3                   0.00       2.61 r
-  U101573/Y (OAI221X1_RVT)                                0.02      0.09       2.70 f
-  n85696 (net)                                  2                   0.00       2.70 f
-  U101728/Y (AO21X1_RVT)                                  0.02      0.10       2.80 f
-  n85689 (net)                                  2                   0.00       2.80 f
-  U101795/Y (AO21X1_RVT)                                  0.02      0.11       2.91 f
-  n85687 (net)                                  2                   0.00       2.91 f
-  U101801/Y (OAI221X1_RVT)                                0.01      0.10       3.01 r
-  n85679 (net)                                  2                   0.00       3.01 r
-  U101802/Y (NAND2X0_RVT)                                 0.05      0.06       3.07 f
-  n85678 (net)                                  2                   0.00       3.07 f
-  U101813/Y (AO21X1_RVT)                                  0.01      0.11       3.18 f
-  n85677 (net)                                  1                   0.00       3.18 f
-  U101820/Y (AO22X1_RVT)                                  0.02      0.08       3.27 f
-  n85681 (net)                                  1                   0.00       3.27 f
-  U101822/Y (AO22X1_RVT)                                  0.01      0.08       3.35 f
-  n85691 (net)                                  1                   0.00       3.35 f
-  U101828/Y (AO222X1_RVT)                                 0.01      0.11       3.46 f
-  n85695 (net)                                  1                   0.00       3.46 f
-  U101830/Y (AO22X1_RVT)                                  0.01      0.08       3.54 f
-  n85697 (net)                                  1                   0.00       3.54 f
-  U101831/Y (NAND2X0_RVT)                                 0.03      0.06       3.60 r
-  n85704 (net)                                  1                   0.00       3.60 r
-  U97684/Y (NAND3X0_RVT)                                  0.08      0.11       3.71 f
-  n85769 (net)                                  2                   0.00       3.71 f
-  U101870/Y (INVX1_RVT)                                   0.02      0.11       3.82 r
-  n85767 (net)                                  3                   0.00       3.82 r
-  U102264/Y (OR2X1_RVT)                                   0.01      0.05       3.87 r
-  n85780 (net)                                  2                   0.00       3.87 r
-  U102248/Y (INVX0_RVT)                                   0.02      0.03       3.90 f
-  n85778 (net)                                  1                   0.00       3.90 f
-  U101874/Y (NAND2X0_RVT)                                 0.04      0.08       3.99 r
-  n87770 (net)                                  4                   0.00       3.99 r
-  U102570/Y (INVX1_RVT)                                   0.15      0.21       4.19 f
-  n86631 (net)                                 18                   0.00       4.19 f
-  U100847/Y (AOI22X1_RVT)                                 0.01      0.23       4.42 r
-  n86632 (net)                                  1                   0.00       4.42 r
-  U102673/Y (NAND4X0_RVT)                                 0.04      0.06       4.48 f
-  n86649 (net)                                  1                   0.00       4.48 f
-  U102679/Y (OA22X1_RVT)                                  0.01      0.10       4.58 f
-  n86651 (net)                                  1                   0.00       4.58 f
-  U102680/Y (NAND2X0_RVT)                                 0.02      0.07       4.65 r
-  n87851 (net)                                  2                   0.00       4.65 r
-  U102681/Y (INVX1_RVT)                                   0.08      0.11       4.76 f
-  intadd_461_B_0_ (net)                         6                   0.00       4.76 f
-  intadd_461_U4/S (FADDX2_RVT)                            0.13      0.49       5.25 f    mo 
-  deHuffer_ibuff_N8947 (net)                   28                   0.00       5.25 f
-  U103271/Y (NAND2X0_RVT)                                 0.03      0.28       5.53 r
-  n87269 (net)                                  2                   0.00       5.53 r
-  U102161/Y (NAND2X0_RVT)                                 0.15      0.17       5.70 f
-  n87270 (net)                                  5                   0.00       5.70 f
-  U103273/Y (INVX1_RVT)                                   0.05      0.19       5.89 r
-  n87463 (net)                                 16                   0.00       5.89 r
-  U97574/Y (INVX1_RVT)                                    0.16      0.28       6.16 f
-  n81749 (net)                                 21                   0.00       6.16 f
-  U97573/Y (NBUFFX2_RVT)                                  0.05      0.31       6.47 f
-  n81748 (net)                                 11                   0.00       6.47 f
-  U103322/Y (AO22X1_RVT)                                  0.02      0.15       6.62 f
-  n87312 (net)                                  1                   0.00       6.62 f
-  U103323/Y (AO22X1_RVT)                                  0.02      0.09       6.71 f
-  n87314 (net)                                  1                   0.00       6.71 f
-  U103324/Y (OA222X1_RVT)                                 0.02      0.10       6.81 f
-  n87324 (net)                                  1                   0.00       6.81 f
-  U103331/Y (AO22X1_RVT)                                  0.02      0.09       6.91 f
-  n87325 (net)                                  1                   0.00       6.91 f
-  U103332/Y (AO22X1_RVT)                                  0.01      0.09       7.00 f
-  n87330 (net)                                  1                   0.00       7.00 f
-  U103333/Y (OAI222X1_RVT)                                0.01      0.10       7.10 r
-  n87335 (net)                                  1                   0.00       7.10 r
-  U103335/Y (OA22X1_RVT)                                  0.01      0.05       7.14 r
-  n87409 (net)                                  1                   0.00       7.14 r
-  U103399/Y (OA221X1_RVT)                                 0.01      0.06       7.20 r
-  n87500 (net)                                  2                   0.00       7.20 r
-  U103402/Y (MUX21X1_RVT)                                 0.01      0.05       7.26 r
-  n87483 (net)                                  1                   0.00       7.26 r
-  U103465/Y (AO22X1_RVT)                                  0.01      0.05       7.30 r
-  n87567 (net)                                  2                   0.00       7.30 r
-  U97626/Y (INVX0_RVT)                                    0.01      0.03       7.34 f
-  n87487 (net)                                  1                   0.00       7.34 f
-  U103468/Y (MUX21X1_RVT)                                 0.02      0.09       7.43 f
-  n87490 (net)                                  1                   0.00       7.43 f
-  U103471/Y (MUX21X1_RVT)                                 0.02      0.10       7.53 f
-  n87491 (net)                                  1                   0.00       7.53 f
-  U103472/Y (AND2X1_RVT)                                  0.01      0.09       7.62 f
-  n87498 (net)                                  1                   0.00       7.62 f
-  U103480/Y (AO22X1_RVT)                                  0.01      0.09       7.71 f
-  n87572 (net)                                  1                   0.00       7.71 f
-  U100912/Y (OR2X1_RVT)                                   0.03      0.12       7.82 f
-  n87731 (net)                                  3                   0.00       7.82 f
-  U101034/Y (AO21X1_RVT)                                  0.01      0.11       7.93 f
-  n87616 (net)                                  1                   0.00       7.93 f
-  U103561/Y (AO22X1_RVT)                                  0.02      0.09       8.02 f
-  n87665 (net)                                  1                   0.00       8.02 f
-  U103591/Y (OA21X1_RVT)                                  0.01      0.09       8.11 f
-  n87723 (net)                                  1                   0.00       8.11 f
-  U103620/Y (OR3X2_RVT)                                   0.02      0.11       8.22 f
-  n87738 (net)                                  4                   0.00       8.22 f
-  U103622/Y (AND2X1_RVT)                                  0.01      0.11       8.33 f
-  n87736 (net)                                  1                   0.00       8.33 f
-  U103628/Y (OR3X2_RVT)                                   0.02      0.11       8.45 f
-  n87737 (net)                                  3                   0.00       8.45 f
-  U103630/SO (HADDX1_RVT)                                 0.01      0.16       8.61 r
-  n87740 (net)                                  1                   0.00       8.61 r
-  U97566/Y (NAND2X0_RVT)                                  0.03      0.04       8.65 f
-  n87742 (net)                                  1                   0.00       8.65 f
-  U103633/Y (AO21X1_RVT)                                  0.03      0.11       8.76 f
-  n87847 (net)                                  2                   0.00       8.76 f
-  U97623/Y (AND2X1_RVT)                                   0.05      0.15       8.90 f
-  n87862 (net)                                  6                   0.00       8.90 f
-  U103780/Y (OA21X1_RVT)                                  0.01      0.12       9.02 f
-  n87861 (net)                                  1                   0.00       9.02 f
-  U103781/Y (AO22X1_RVT)                                  0.01      0.08       9.11 f
-  n80584 (net)                                  1                   0.00       9.11 f
-  deHuffer_block_buff_head_reg_2_/D (DFFX1_RVT)           0.01      0.05       9.16 f
-  data arrival time                                                            9.16
+  Point                                  Fanout     Trans      Incr       Path      Attributes
+  ----------------------------------------------------------------------------------------------------
+  clock core_clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                                  0.20       0.20
+  deHuffer_ibuff_head_reg_5_/CLK (DFFX2_RVT)         0.08      0.00       0.20 r
+  deHuffer_ibuff_head_reg_5_/Q (DFFX2_RVT)           0.13      0.24       0.44 f
+  deHuffer_ibuff_head[5] (net)            14                   0.00       0.44 f
+  U72525/Y (INVX1_RVT)                               0.03      0.23       0.68 r
+  n65593 (net)                             5                   0.00       0.68 r
+  U69248/Y (INVX2_RVT)                               0.14      0.20       0.88 f
+  n62271 (net)                            29                   0.00       0.88 f
+  U69074/Y (INVX1_RVT)                               0.03      0.37       1.25 r
+  n65441 (net)                             2                   0.00       1.25 r
+  U72571/Y (AO22X1_RVT)                              0.01      0.05       1.30 r
+  n65408 (net)                             1                   0.00       1.30 r
+  U72572/Y (AO222X1_RVT)                             0.02      0.09       1.38 r
+  n65531 (net)                             3                   0.00       1.38 r
+  U72578/Y (MUX41X1_RVT)                             0.02      0.08       1.47 r
+  n65421 (net)                             2                   0.00       1.47 r
+  U69064/Y (INVX0_RVT)                               0.01      0.03       1.50 f
+  n65431 (net)                             1                   0.00       1.50 f
+  U72606/Y (OA22X1_RVT)                              0.02      0.10       1.60 f
+  n65609 (net)                             2                   0.00       1.60 f
+  U68968/Y (AO22X1_RVT)                              0.14      0.23       1.84 f
+  n65707 (net)                            14                   0.00       1.84 f
+  U69056/Y (INVX0_RVT)                               0.03      0.18       2.02 r
+  n62234 (net)                             3                   0.00       2.02 r
+  U73539/Y (NAND2X0_RVT)                             0.03      0.05       2.07 f
+  n66442 (net)                             1                   0.00       2.07 f
+  U73540/Y (AO21X1_RVT)                              0.02      0.09       2.16 f
+  n66445 (net)                             2                   0.00       2.16 f
+  U73541/Y (AOI22X1_RVT)                             0.01      0.10       2.26 r
+  n66444 (net)                             1                   0.00       2.26 r
+  U73542/Y (OA221X1_RVT)                             0.01      0.04       2.30 r
+  n66471 (net)                             1                   0.00       2.30 r
+  U73554/Y (NAND4X0_RVT)                             0.05      0.07       2.38 f
+  n66473 (net)                             1                   0.00       2.38 f
+  U69203/Y (OR2X1_RVT)                               0.06      0.15       2.53 f
+  n66899 (net)                             6                   0.00       2.53 f
+  U73695/Y (AO221X1_RVT)                             0.02      0.16       2.69 f
+  n66891 (net)                             2                   0.00       2.69 f
+  U73762/Y (AO21X1_RVT)                              0.02      0.11       2.79 f
+  n66889 (net)                             2                   0.00       2.79 f
+  U73892/Y (AO21X1_RVT)                              0.02      0.11       2.90 f
+  n66888 (net)                             2                   0.00       2.90 f
+  U73911/Y (OA221X1_RVT)                             0.03      0.12       3.01 f
+  n66881 (net)                             2                   0.00       3.01 f
+  U73912/Y (OR2X1_RVT)                               0.02      0.12       3.13 f
+  n66880 (net)                             2                   0.00       3.13 f
+  U73175/Y (AO21X1_RVT)                              0.01      0.10       3.23 f
+  n66879 (net)                             1                   0.00       3.23 f
+  U73931/Y (AO22X1_RVT)                              0.02      0.09       3.33 f
+  n66882 (net)                             2                   0.00       3.33 f
+  U73933/Y (AO221X1_RVT)                             0.02      0.12       3.45 f
+  n66886 (net)                             1                   0.00       3.45 f
+  U73936/Y (AO222X1_RVT)                             0.01      0.09       3.54 f
+  n66890 (net)                             1                   0.00       3.54 f
+  U73937/Y (AO22X1_RVT)                              0.01      0.08       3.62 f
+  n66893 (net)                             1                   0.00       3.62 f
+  U72383/Y (AO22X1_RVT)                              0.03      0.11       3.73 f
+  n66959 (net)                             3                   0.00       3.73 f
+  U72448/Y (INVX1_RVT)                               0.01      0.11       3.84 r
+  n66961 (net)                             3                   0.00       3.84 r
+  U69174/Y (NAND2X0_RVT)                             0.07      0.09       3.93 f
+  n66964 (net)                             3                   0.00       3.93 f
+  U69014/Y (INVX0_RVT)                               0.02      0.09       4.03 r
+  n66969 (net)                             2                   0.00       4.03 r
+  U72338/Y (NAND2X0_RVT)                             0.15      0.18       4.20 f
+  n67096 (net)                             6                   0.00       4.20 f
+  U74089/Y (OA22X1_RVT)                              0.02      0.14       4.34 f
+  n67103 (net)                             1                   0.00       4.34 f
+  U74091/Y (NAND4X0_RVT)                             0.02      0.07       4.42 r
+  n67118 (net)                             1                   0.00       4.42 r
+  U74096/Y (OA22X1_RVT)                              0.01      0.05       4.46 r
+  n67120 (net)                             1                   0.00       4.46 r
+  U74097/Y (NAND2X0_RVT)                             0.09      0.10       4.57 f
+  n67187 (net)                             3                   0.00       4.57 f
+  U72345/Y (AO22X1_RVT)                              0.03      0.14       4.71 f
+  n67782 (net)                             2                   0.00       4.71 f
+  U68962/SO (HADDX1_RVT)                             0.01      0.16       4.87 r
+  n67906 (net)                             3                   0.00       4.87 r
+  U69146/Y (INVX1_RVT)                               0.22      0.25       5.12 f
+  n67338 (net)                            26                   0.00       5.12 f
+  U68967/Y (NAND2X0_RVT)                             0.06      0.29       5.41 r
+  n67341 (net)                             5                   0.00       5.41 r
+  U68959/Y (NAND3X0_RVT)                             0.09      0.12       5.53 f
+  n67390 (net)                             2                   0.00       5.53 f
+  U74271/SO (HADDX1_RVT)                             0.03      0.21       5.74 r
+  n67378 (net)                            17                   0.00       5.74 r
+  U68966/Y (INVX1_RVT)                               0.15      0.22       5.96 f
+  n67424 (net)                            16                   0.00       5.96 f
+  U74300/Y (AO221X1_RVT)                             0.02      0.21       6.17 f
+  n67409 (net)                             1                   0.00       6.17 f
+  U74305/Y (OA222X1_RVT)                             0.02      0.11       6.27 f
+  n67416 (net)                             1                   0.00       6.27 f
+  U74312/Y (AO22X1_RVT)                              0.02      0.09       6.36 f
+  n67433 (net)                             1                   0.00       6.36 f
+  U72413/Y (AO22X1_RVT)                              0.01      0.09       6.46 f
+  n67436 (net)                             1                   0.00       6.46 f
+  U74326/Y (OAI222X1_RVT)                            0.01      0.10       6.56 r
+  n67440 (net)                             1                   0.00       6.56 r
+  U68980/Y (NOR2X0_RVT)                              0.04      0.09       6.65 f
+  n67700 (net)                             4                   0.00       6.65 f
+  U74549/Y (AND2X1_RVT)                              0.01      0.12       6.77 f
+  n67701 (net)                             1                   0.00       6.77 f
+  U74550/Y (AO21X1_RVT)                              0.01      0.08       6.84 f
+  n67704 (net)                             1                   0.00       6.84 f
+  U74551/Y (MUX21X1_RVT)                             0.02      0.10       6.94 f
+  n67706 (net)                             1                   0.00       6.94 f
+  U74552/Y (NOR2X0_RVT)                              0.01      0.10       7.04 r
+  n67708 (net)                             1                   0.00       7.04 r
+  U69157/Y (NOR3X0_RVT)                              0.01      0.07       7.11 f
+  n67723 (net)                             1                   0.00       7.11 f
+  U72388/Y (OAI22X1_RVT)                             0.01      0.10       7.20 r
+  n65387 (net)                             1                   0.00       7.20 r
+  U74563/Y (OA21X1_RVT)                              0.01      0.04       7.24 r
+  n67867 (net)                             1                   0.00       7.24 r
+  U69123/Y (OA221X1_RVT)                             0.02      0.07       7.31 r
+  n67868 (net)                             5                   0.00       7.31 r
+  U72349/Y (NAND2X0_RVT)                             0.03      0.05       7.36 f
+  n65365 (net)                             1                   0.00       7.36 f
+  U74664/Y (OR3X2_RVT)                               0.01      0.10       7.47 f
+  n67877 (net)                             1                   0.00       7.47 f
+  U74665/Y (OR3X1_RVT)                               0.01      0.10       7.56 f
+  n67880 (net)                             1                   0.00       7.56 f
+  U74666/Y (OA21X1_RVT)                              0.02      0.08       7.64 f
+  n67882 (net)                             1                   0.00       7.64 f
+  U69022/Y (NOR3X0_RVT)                              0.01      0.10       7.74 r
+  deHuffer_block_buff_N2556 (net)          2                   0.00       7.74 r
+  U69020/Y (NOR3X0_RVT)                              0.06      0.11       7.86 f
+  n67977 (net)                             6                   0.00       7.86 f
+  U72381/Y (OAI21X1_RVT)                             0.01      0.13       7.99 r
+  n65382 (net)                             1                   0.00       7.99 r
+  U74672/Y (OAI22X1_RVT)                             0.01      0.06       8.05 f
+  n60460 (net)                             1                   0.00       8.05 f
+  deHuffer_block_buff_head_reg_3_/D (DFFX1_RVT)      0.01      0.05       8.10 f
+  data arrival time                                                       8.10
 
-  clock core_clk (rise edge)                                       10.00      10.00
-  clock network delay (ideal)                                       0.20      10.20
-  clock uncertainty                                                -1.00       9.20
-  deHuffer_block_buff_head_reg_2_/CLK (DFFX1_RVT)                   0.00       9.20 r
-  library setup time                                               -0.01       9.19
-  data required time                                                           9.19
-  ---------------------------------------------------------------------------------------------------------
-  data required time                                                           9.19
-  data arrival time                                                           -9.16
-  ---------------------------------------------------------------------------------------------------------
-  slack (MET)                                                                  0.03
+  clock core_clk (rise edge)                                   9.00       9.00
+  clock network delay (ideal)                                  0.20       9.20
+  clock uncertainty                                           -0.90       8.30
+  deHuffer_block_buff_head_reg_3_/CLK (DFFX1_RVT)              0.00       8.30 r
+  library setup time                                          -0.01       8.29
+  data required time                                                      8.29
+  ----------------------------------------------------------------------------------------------------
+  data required time                                                      8.29
+  data arrival time                                                      -8.10
+  ----------------------------------------------------------------------------------------------------
+  slack (MET)                                                             0.19
 
 
 1
