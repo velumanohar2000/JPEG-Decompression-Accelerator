@@ -70,7 +70,8 @@ module header_reader_tb;
             @(posedge clk);
 
             data_in = jpeg_raw[word_idx];
-            $display("!!!Data_in for this cycle is %h @ time: %0t", data_in, $time);
+            //VERY USEFUL FOR DEBUGGING!!!
+            //$display("!!!Data_in for this cycle is %h @ time: %0t", data_in, $time);
 
             // FSM state transitions are explicitly printed internally; detect using simulation outputs
         end
