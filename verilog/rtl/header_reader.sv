@@ -190,8 +190,6 @@ module header_reader (
     logic [7:0] SOF0_buffer [0:31]; // 32-byte buffer
     logic [6:0] SOF0_byte_cnt;
 
-  
-
     logic [15:0] DHT_len;                          // Segment length (JPEG header info)
     logic [7:0]  DHT_info;                         // Huffman Table Class and ID byte
     logic [8:0]  DHT_sym_ttl;                        // Total number of symbols
@@ -202,7 +200,6 @@ module header_reader (
     logic [8:0]  DHT_sym_byte_cnt;                 //Where we are in the large symbol buffer
     logic [8:0]  DHT_inc_sum;                      // To build up the offset locatiosn for each code elngth I require this 
     logic [7:0]  prior_byte;
-
 
     // Parsed Table Class/ID (for clarity)
     logic        DHT_class;                        // 0 = DC, 1 = AC
@@ -394,6 +391,9 @@ module header_reader (
                 else if (|dqt_marker_status) next_state = DQT;
                 else if (|sos_marker_status) next_state = SOS;
             end
+            SOS: begin
+                if(|eoi_marker_status) next_state = BLANK;
+            end
             default: next_state = state;
             
         endcase
@@ -480,9 +480,6 @@ module header_reader (
                     end
                 endcase
             end else if (state == DQT) begin 
-`ifdef DEBUG
-                print_quant_packet(DQT_out);
-`endif
                 // Continue filling the quant table 4 bytes per cycle
                 quant_packet.tabs[DQT_info[3:0]].tab[DQT_fill_idx      >> 3][DQT_fill_idx      & 3'b111] <= data_in[31:24];
                 quant_packet.tabs[DQT_info[3:0]].tab[(DQT_fill_idx+1) >> 3][(DQT_fill_idx+1) & 3'b111] <= data_in[23:16];
@@ -552,11 +549,14 @@ module header_reader (
                             end
                         end
                     endcase
-
+`ifdef DEBUG
                     $display("✅ Quantization Table %0d fully filled at time %0t", DQT_fill_offset, $time);
                     if (DQT_fill_offset + 1 >= DQT_seg_tbl_num) begin
                         $display("🎯 All Quant Tables Filled, returning to marker scanning.");
+                        print_quant_packet(DQT_out);
+
                     end
+`endif
                 end
             end
             /* END of DQT handling ----------------------------*/
@@ -613,21 +613,19 @@ module header_reader (
                 // Increment byte counter by 4 bytes
                 SOF0_byte_cnt <= SOF0_byte_cnt + 4;
 `ifdef DEBUG
-                print_SOF0_out(SOF0_out);
-`endif
                 //Buffer is big enough I can just copy spare bits in an break out into the next state without error. 
                 if (SOF0_byte_cnt >= SOF0_out.len) begin
                     $display("✅ SOF0 buffer filled completely at time %0t", $time);
+                    print_SOF0_out(SOF0_out);
+
                 end
+`endif
             end
 
             /* END of SOF0 handling -------------------------*/
             /* START of DHT handling ------------------------*/
-
             if (next_state == DHT && |dht_marker_status) begin
-                $display("!!!@!@ HERE WE ARE");
                 DHT_sym_byte_cnt <= '0;
-
                 saved_marker_status <= dht_marker_status;
                 case (dht_marker_status)
                     4'b1000: begin
@@ -655,7 +653,6 @@ module header_reader (
                         DHT_code_counts[1] <= data_in[7:0];
                     end
                     4'b0001: begin
-                        $display("Got length: %d ", last_data_in[23:8]);
                         DHT_len  <= last_data_in[23:8];
                         DHT_info <= last_data_in[7:0];
                         DHT_len_byte_cnt <= 4;
@@ -720,14 +717,6 @@ module header_reader (
                     end
                 end else begin
                     if(DHT_len_byte_cnt == 16) begin
-                        $display("Total size is: %d, vector is: %b", DHT_code_counts[1] + DHT_code_counts[2] + DHT_code_counts[3] + DHT_code_counts[4] + 
-                                DHT_code_counts[5] + DHT_code_counts[6] + DHT_code_counts[7] + DHT_code_counts[8] + 
-                                DHT_code_counts[9] + DHT_code_counts[10] + DHT_code_counts[11] + DHT_code_counts[12] +
-                                DHT_code_counts[13] + DHT_code_counts[14] + DHT_code_counts[15] + DHT_code_counts[16], {|DHT_code_counts[1],  |DHT_code_counts[2],  |DHT_code_counts[3],  |DHT_code_counts[4],
-                                |DHT_code_counts[5],  |DHT_code_counts[6],  |DHT_code_counts[7],  |DHT_code_counts[8],
-                                |DHT_code_counts[9],  |DHT_code_counts[10], |DHT_code_counts[11], |DHT_code_counts[12],
-                                |DHT_code_counts[13], |DHT_code_counts[14], |DHT_code_counts[15], |DHT_code_counts[16]} );
-
                         if (DHT_class == 1'b1) begin  // AC Huffman table
                             huff_packet.tabs[DHT_id].ac_size <= (DHT_code_counts[1] + DHT_code_counts[2] + DHT_code_counts[3] + DHT_code_counts[4] + 
                                 DHT_code_counts[5] + DHT_code_counts[6] + DHT_code_counts[7] + DHT_code_counts[8] + 
@@ -748,26 +737,25 @@ module header_reader (
                                 |DHT_code_counts[13], |DHT_code_counts[14], |DHT_code_counts[15], |DHT_code_counts[16]};
                         end
                         DHT_len_byte_cnt <= 17;
-                    end 
-                    $display("\nID changing?: %d", DHT_id);
+                    end  
                     DHT_sym_buffer[DHT_sym_byte_cnt ]       <= data_in[31:24];
                     DHT_sym_buffer[DHT_sym_byte_cnt +1]     <= data_in[23:16];
                     DHT_sym_buffer[DHT_sym_byte_cnt +2]     <= data_in[15:8];
                     DHT_sym_buffer[DHT_sym_byte_cnt +3]     <= data_in[7:0];
                     DHT_sym_byte_cnt <= DHT_sym_byte_cnt + 4;
-                    $display("\Current %d",DHT_sym_byte_cnt);
-                    $display("\nNumber %d",DHT_len_byte_cnt);
                     if(DHT_class == 1'b1) begin //This is AC
                         if(DHT_sym_byte_cnt + 4 > huff_packet.tabs[DHT_id].ac_size) begin
                             huff_packet.tabs[DHT_id].ac_tab <= gened_huff.ac_tab;
-                            $display("About to finish table ");
+`ifdef DEBUG
                             display_gened_huff(gened_huff, DHT_info);
+`endif
                         end
                     end else begin
                         if(DHT_sym_byte_cnt + 4 > huff_packet.tabs[DHT_id].dc_size) begin
                             huff_packet.tabs[DHT_id].dc_tab <= gened_huff.dc_tab;
-                            $display("About to finish table ");
+`ifdef DEBUG
                             display_gened_huff(gened_huff, DHT_info);
+`endif
                         end
                     end
                 end
@@ -782,8 +770,10 @@ module header_reader (
 
 
         if (next_state == SOS && |sos_marker_status) begin //First case are we entering SOS state fresh off a marker?
-            $display("\nWitnesses SOS, seeing last:%h and current: %h", last_data_in, data_in);
             saved_marker_status <= sos_marker_status;
+`ifdef DEBUG
+            $display("\nPrepare for SOS bitstream: \n");
+`endif
             case (sos_marker_status)
                 4'b1000: begin // Mark ends then 2 remaining 
                     SOS_buffer[SOS_tail] <= last_data_in[15:8];
@@ -822,15 +812,14 @@ module header_reader (
             endcase
             
         end else if(state == SOS) begin
-            $display("Suffing Marker: %b, tesing indexing: %b" ,stuffing_marker_status, stuffing_marker_status[3]);
-            $display("SOS Diff: %d", ({SOS_tail - SOS_head}[3:0]));
+            /*
+    
             $display("SOS_buffer Buffer: [%02h %02h %02h %02h %02h %02h %02h %02h %02h %02h %02h %02h %02h %02h %02h %02h] | head: %d | tail: %d",
-         SOS_buffer[0], SOS_buffer[1], SOS_buffer[2], SOS_buffer[3],
-         SOS_buffer[4], SOS_buffer[5], SOS_buffer[6], SOS_buffer[7],
-         SOS_buffer[8], SOS_buffer[9], SOS_buffer[10], SOS_buffer[11],
-         SOS_buffer[12], SOS_buffer[13], SOS_buffer[14], SOS_buffer[15],
-         SOS_head, SOS_tail);
-
+            SOS_buffer[0], SOS_buffer[1], SOS_buffer[2], SOS_buffer[3],
+            SOS_buffer[4], SOS_buffer[5], SOS_buffer[6], SOS_buffer[7],
+            SOS_buffer[8], SOS_buffer[9], SOS_buffer[10], SOS_buffer[11],
+            SOS_buffer[12], SOS_buffer[13], SOS_buffer[14], SOS_buffer[15],
+            SOS_head, SOS_tail);*/
             case (stuffing_marker_status)
                 4'b0000: begin
                     SOS_buffer[SOS_tail]     <= last_data_in[31:24];
@@ -841,7 +830,6 @@ module header_reader (
                 end
   
                 4'b0010: begin
-                    $display("Stuffing witnessed!");
                     SOS_buffer[SOS_tail]     <= last_data_in[31:24];
                     SOS_buffer[SOS_tail + 1] <= last_data_in[23:16];
                     SOS_buffer[SOS_tail + 2] <= last_data_in[15:8];
@@ -849,33 +837,31 @@ module header_reader (
                     SOS_tail <= SOS_tail + 4;
                 end
                 4'b0100: begin
-                    $display("Stuffing witnessed!");
                     SOS_buffer[SOS_tail]     <= last_data_in[31:24];
                     SOS_buffer[SOS_tail + 1] <= last_data_in[23:16];
                     SOS_buffer[SOS_tail + 2] <= last_data_in[7:0];
                     SOS_tail <= SOS_tail + 3;
                 end
                 4'b1000: begin
-                    $display("Stuffing witnessed!");
                     SOS_buffer[SOS_tail]     <= last_data_in[31:24];
                     SOS_buffer[SOS_tail + 1] <= last_data_in[15:8];
                     SOS_buffer[SOS_tail + 2] <= last_data_in[7:0];
                     SOS_tail <= SOS_tail + 3;
                 end
                 default: begin
-                    $display("Multiple stuffing markers detected!");
-                    // Optionally handle error or multiple markers
+                    //$display("Multiple stuffing markers detected!");
+                    // Optionally handle error or multiple markers TODO but frankly
                 end
             endcase
 
             if(SOS_tail - SOS_head > 3) begin
-                $display("Export 8 and display");
+
                 SOS_to_fifo[31:24] <= SOS_buffer[SOS_head];
                 SOS_to_fifo[23:16] <= SOS_buffer[SOS_head + 1];
                 SOS_to_fifo[15:8] <= SOS_buffer[SOS_head + 2];
                 SOS_to_fifo[7:0] <= SOS_buffer[SOS_head + 3];
                 SOS_head <= SOS_head + 4;
-                $display("Will output: %h",{SOS_buffer[SOS_head], SOS_buffer[SOS_head+1],SOS_buffer[SOS_head+2],SOS_buffer[SOS_head+3]} );
+                $display("%b",{SOS_buffer[SOS_head], SOS_buffer[SOS_head+1],SOS_buffer[SOS_head+2],SOS_buffer[SOS_head+3]} );
             end
         end
                         /* START of SOS handling --------------------------*/
