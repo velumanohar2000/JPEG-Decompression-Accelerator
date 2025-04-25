@@ -2,15 +2,15 @@
 `define __SYS_DEFS_SVH__
 
 `timescale 1ns/100ps
-
+// JPED Standard (JFIF) ITU-T Recommendation T.81 (ISO/IEC 10918-1)
 `define Q  8                    // Precision (bits)
 `define DC_H 12                    // Max Size of DC Huffman table (number of entries)
 `define AC_H 162                    // Max Size of AC Huffman table (number of entries)
 `define MAX_HUFF_CODE_WIDTH 16  //Max huff code size
 `define H 162                     // Max Size of any Huffman table (num entries)
-`define HN 2                    // Number of Huffman table destinations/indexes
+`define HN 4                    // Number of Huffman table destinations/indexes
 `define CH 3                    // Number of channels in image
-`define QN 2                    // Number of Quantization table destinations/indexes
+`define QN 4                    // Number of Quantization table destinations/indexes this is 4 for standard just keeping consisten
 `define IN 32                   // Int to decoder (bits per cycle)
 `define PERIOD 20               // Clock period (ns)
 `define IN_BUS_WIDTH 32         // Input bus bit width 
@@ -24,8 +24,10 @@ typedef struct packed {
 } HUFF_TABLE_ENTRY;
 
 typedef struct packed {
+    logic [`MAX_HUFF_CODE_WIDTH-1:0] dc_length_opts; //bit vector 1 means that length (pos +1) is utilized 0 means it is not.
     HUFF_TABLE_ENTRY [`DC_H-1:0] dc_tab;
     logic [$clog2(`DC_H+1)-1:0] dc_size;
+    logic [`MAX_HUFF_CODE_WIDTH-1:0] ac_length_opts; //bit vector 1 means that length (pos +1) is utilized 0 means it is not.
     HUFF_TABLE_ENTRY [`AC_H-1:0] ac_tab;
     logic [$clog2(`AC_H+1)-1:0] ac_size;
 } HUFF_TABLE;
