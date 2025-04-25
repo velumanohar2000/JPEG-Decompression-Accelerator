@@ -18,7 +18,7 @@ def bytes_to_words(data, word_size=4):
         words.append(word)
     return words
 
-def write_svh(words, mode, out_path, array_name="jpeg_data"):
+def write_svh(words, mode, out_path, array_name="jpeg_raw"):
     count = len(words)
 
     with open(out_path, 'w') as f:
